@@ -8,8 +8,11 @@ namespace api_painel_producao.Repositories {
         Task CreateAsync (User user);
         Task UpdateAsync (User user);
         Task DeleteAsync (User user);
+        Task DeactivateUserAsync (User user);
+        Task UpdatePassword (User user, string salt, string hash);
         Task<List<User>> GetAllAsync ();
         Task<User?> GetByIdAsync (int id);
+        Task<User?> GetByUsernameAsync (string username);
     }
 
     public class UserRepository : IUserRepository {
@@ -22,6 +25,10 @@ namespace api_painel_producao.Repositories {
 
         public async Task<User?> GetByIdAsync (int id) {
             return await _context.Users.FindAsync(id);
+        }
+
+        public async Task<User?> GetByUsernameAsync (string username) {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
         }
 
         public async Task<List<User>> GetAllAsync ()
@@ -41,6 +48,21 @@ namespace api_painel_producao.Repositories {
 
         public async Task DeleteAsync (User user) {
             _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeactivateUserAsync (User user) {
+            user.IsActive = false;
+            user.DeactivatedAt = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdatePassword (User user, string salt, string hash) {
+            user.PasswordSalt = salt;
+            user.PasswordHash = hash;
+
+            user.LastModifiedAt = DateTime.Now;
             await _context.SaveChangesAsync();
         }
     }
