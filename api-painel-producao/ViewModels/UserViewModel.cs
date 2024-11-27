@@ -27,13 +27,23 @@ namespace api_painel_producao.ViewModels {
 
     public class UserLoginViewModel {
 
-        [Required(ErrorMessage = "O nome de usuário é obrigatório.")]
-        [RegularExpression(@"^[a-zA-Z0-9]*$", ErrorMessage = "O nome de usuário só pode conter letras e números.")]
+        [Required (ErrorMessage = "O nome de usuário é obrigatório.")]
+        [RegularExpression (@"^[a-zA-Z0-9]*$", ErrorMessage = "O nome de usuário só pode conter letras e números.")]
         public string Username { get; set; } = string.Empty;
 
 
-        [Required(ErrorMessage = "A senha é obrigatória.")]
-        [MinLength(8, ErrorMessage = "A senha deve ter no mínimo 8 caracteres.")]
+        [Required (ErrorMessage = "A senha é obrigatória.")]
+        [MinLength (8, ErrorMessage = "A senha deve ter no mínimo 8 caracteres.")]
         public string Password { get; set; } = string.Empty;
+    }
+
+
+    public class UserChangePasswordViewModel {
+
+        [Required (ErrorMessage = "A nova senha é obrigatória.")]
+        [MinLength(8, ErrorMessage = "A senha deve ter no mínimo 8 caracteres.")]
+        public static string NewPassword { get; set; }
+
+        public static string OldPassword { get; set; }
     }
 }

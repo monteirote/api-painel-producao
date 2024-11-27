@@ -11,6 +11,8 @@ namespace api_painel_producao.Utils {
 
         public string Message { get; set; } = string.Empty;
 
+        public bool PermissionDenied { get; set; } = false;
+
         public T? Data { get; set; } = default;
 
 
@@ -20,12 +22,16 @@ namespace api_painel_producao.Utils {
             Data = data;
         }
 
-        public static ServiceResponse<T> Ok(T data, string message = "Operação bem-sucedida.") {
+        public static ServiceResponse<T> Ok (T data, string message = "Operação bem-sucedida.") {
             return new ServiceResponse<T>(true, message, data);
         }
 
-        public static ServiceResponse<T> Fail(string message) {
+        public static ServiceResponse<T> Fail (string message) {
             return new ServiceResponse<T>(false, message);
+        }
+
+        public static ServiceResponse<T> PermissionDenied (string message = "Action failed: You do not have the required permissions.") { 
+            return new ServiceResponse<T>(false, message) { PermissionDenied = true };
         }
 
         public ServiceResponse() { }

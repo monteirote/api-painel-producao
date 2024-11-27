@@ -11,6 +11,8 @@ namespace api_painel_producao.Services {
         Task<ServiceResponse<int>> CreateUserAsync (UserSignupViewModel user);
         Task<ServiceResponse<string>> LoginAsync (UserLoginViewModel user);
         Task<ServiceResponse<string>> DeactivateUserAsync (string token, int userId);
+        Task<ServiceResponse<string>> ChangePasswordAsync (string token, int userId, string newPassword, string oldPassword = "");
+        Task<ServiceResponse<T>> ActivateUserAsync (int userId);
     }
 
 
@@ -102,26 +104,34 @@ namespace api_painel_producao.Services {
             var tokenUser = await _authService.ExtractTokenInfo(token);
 
             if (tokenUser is null)
-                return new ServiceResponse<string> { Success = false, Message = "Action failed: This token is not valid." };
+                return ServiceResponse<T>.Fail("Action failed: This token is not valid.");
 
 
             var userToChangePassword = await _repository.GetByIdAsync(userId);
 
             if (tokenUser.Role.ToString() != "Admin" && userToChangePassword.Id != tokenUser.Id)
-                return new ServiceResponse<string> { Success = false, Message = "Action failed: You do not have the required permissions." };
+                return ServiceResponse<T>.PermissionDenied();
 
             if (!VerifyPassword(oldPassword, userToChangePassword.PasswordSalt, userToChangePassword.PasswordHash) && tokenUser.Role.ToString() != "Admin")
-                return new ServiceResponse<string> { Success = false, Message = "Action failed: Incorrect password." };
+                return ServiceResponse<T>.Fail("Action failed: Incorrect password.");
 
             var newHashedPassword = GenerateHash(newPassword);
             var info = newHashedPassword.Split(':');
 
             await _repository.UpdatePassword(userToChangePassword, info[0], info[1]);
 
-            return new ServiceResponse<string> { Success = true, Message = "Password has been successfully updated." };
+            return ServiceResponse<string>.Ok(null, "Password has been successfully updated.");
         }
 
+        public async Task<ServiceResponse<T>> ActivateUserAsync (int userId) {
+            var userToActivate = await _repository.GetByIdAsync(userId);
 
+            if (userToActivate is null)
+                return ServiceResponse<T>.Fail("Action failed: This user does not exist.");
+
+            await _repository.
+
+        }
 
 
         private static string GenerateHash (string password) {

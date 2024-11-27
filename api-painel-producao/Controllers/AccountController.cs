@@ -31,7 +31,8 @@ namespace api_painel_producao.Controllers {
 
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login ([FromBody] UserLoginViewModel userData) { 
+        public async Task<IActionResult> Login ([FromBody] UserLoginViewModel userData) {
+
             ServiceResponse<string> response = await _service.LoginAsync(userData);
             
             if (!response.Success)
@@ -41,14 +42,11 @@ namespace api_painel_producao.Controllers {
         }
 
 
-        [HttpPost ("deactivate")]
+        [HttpPut ("{id}/deactivate")]
         [Authorize (Roles = "Admin, Vendedor")]
-        public async Task<IActionResult> DeactivateAccount ([FromQuery] int id) { 
+        public async Task<IActionResult> DeactivateAccount ([FromRoute] int id) { 
 
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-
-            if (string.IsNullOrEmpty(token))
-                return Unauthorized(new { Success = false, Message = "Token is missing or invalid." });
 
             ServiceResponse<string> response = await _service.DeactivateUserAsync(token, id);
 
@@ -59,5 +57,28 @@ namespace api_painel_producao.Controllers {
         }
 
 
+        [HttpPut ("{id}/activate")]
+        [Authorize (Roles = "Admin")]
+        public async Task<IActionResult> ActivateAccount ([FromRoute] int id) { 
+            
+        }
+
+
+        [HttpPost ("{id}/change-password")]
+        [Authorize (Roles = "Admin, Vendedor")]
+        public async Task<IActionResult> ChangePassword ([FromRoute] int id, [FromBody] UserChangePasswordViewModel userData) {
+
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ServiceResponse<string> response = await _service.ChangePasswordAsync(token, id, userData.NewPassword, userData.OldPassword);
+
+            if (response.PermissionDenied)
+                return Forbidden(response.Message);
+
+            if (!response.Success)
+                return BadRequest(response.Message);
+
+            return NoContent();
+        }
     }
 }

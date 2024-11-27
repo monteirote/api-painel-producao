@@ -12,7 +12,7 @@ namespace api_painel_producao.Models {
 
         public UserRole Role { get; set; } = UserRole.Vendedor;
 
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastModifiedAt { get; set; }
         public DateTime? DeactivatedAt { get; set; }

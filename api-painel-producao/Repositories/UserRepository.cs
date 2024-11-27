@@ -31,8 +31,7 @@ namespace api_painel_producao.Repositories {
             return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
         }
 
-        public async Task<List<User>> GetAllAsync ()
-        {
+        public async Task<List<User>> GetAllAsync () {
             return await _context.Users.ToListAsync();
         }
 
@@ -63,6 +62,13 @@ namespace api_painel_producao.Repositories {
             user.PasswordHash = hash;
 
             user.LastModifiedAt = DateTime.Now;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task ActivateUserAsync (User user) {
+            user.IsActive = true;
+            user.LastModifiedAt = DateTime.Now;
+
             await _context.SaveChangesAsync();
         }
     }
