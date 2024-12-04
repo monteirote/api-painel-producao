@@ -59,12 +59,19 @@ namespace api_painel_producao.Controllers {
 
         [HttpPut ("{id}/activate")]
         [Authorize (Roles = "Admin")]
-        public async Task<IActionResult> ActivateAccount ([FromRoute] int id) { 
-            
+        public async Task<IActionResult> ActivateAccount ([FromRoute] int id) {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ServiceResponse<string> response = await _service.DeactivateUserAsync(token, id);
+
+            if (!response.Success)
+                return Unauthorized(response);
+
+            return Ok(response);
         }
 
 
-        [HttpPost ("{id}/change-password")]
+        [HttpPut ("{id}/change-password")]
         [Authorize (Roles = "Admin, Vendedor")]
         public async Task<IActionResult> ChangePassword ([FromRoute] int id, [FromBody] UserChangePasswordViewModel userData) {
 
@@ -73,7 +80,7 @@ namespace api_painel_producao.Controllers {
             ServiceResponse<string> response = await _service.ChangePasswordAsync(token, id, userData.NewPassword, userData.OldPassword);
 
             if (response.PermissionDenied)
-                return Forbidden(response.Message);
+                return Forbid(response.Message);
 
             if (!response.Success)
                 return BadRequest(response.Message);

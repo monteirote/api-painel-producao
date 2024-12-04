@@ -16,7 +16,7 @@ namespace api_painel_producao.Utils {
         public T? Data { get; set; } = default;
 
 
-        public ServiceResponse (bool success, string message, T? data = default) {
+        private ServiceResponse (bool success, string message, T? data = default) {
             Success = success;
             Message = message;
             Data = data;
@@ -30,10 +30,10 @@ namespace api_painel_producao.Utils {
             return new ServiceResponse<T>(false, message);
         }
 
-        public static ServiceResponse<T> PermissionDenied (string message = "Action failed: You do not have the required permissions.") { 
+        public static ServiceResponse<T> DenyPermission (string message = "Action failed: You do not have the required permissions.") { 
             return new ServiceResponse<T>(false, message) { PermissionDenied = true };
         }
 
-        public ServiceResponse() { }
+        private ServiceResponse() { }
     }
 }

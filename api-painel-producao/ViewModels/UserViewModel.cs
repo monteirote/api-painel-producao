@@ -4,8 +4,8 @@ namespace api_painel_producao.ViewModels {
 
     public class UserSignupViewModel {
 
-        [Required (ErrorMessage = "O nome é obrigatório.")]
-        [StringLength (50, ErrorMessage = "O nome pode ter no máximo 50 caracteres.")]
+        [Required(ErrorMessage = "O nome é obrigatório.")]
+        [StringLength(50, ErrorMessage = "O nome pode ter no máximo 50 caracteres.")]
         public string Name { get; set; } = string.Empty;
 
 
@@ -42,8 +42,8 @@ namespace api_painel_producao.ViewModels {
 
         [Required (ErrorMessage = "A nova senha é obrigatória.")]
         [MinLength(8, ErrorMessage = "A senha deve ter no mínimo 8 caracteres.")]
-        public static string NewPassword { get; set; }
+        public string NewPassword { get; set; }
 
-        public static string OldPassword { get; set; }
+        public string OldPassword { get; set; }
     }
 }

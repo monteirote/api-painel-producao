@@ -13,6 +13,7 @@ namespace api_painel_producao.Repositories {
         Task<List<User>> GetAllAsync ();
         Task<User?> GetByIdAsync (int id);
         Task<User?> GetByUsernameAsync (string username);
+        Task ActivateUserAsync(User user);
     }
 
     public class UserRepository : IUserRepository {

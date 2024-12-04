@@ -12,7 +12,7 @@ namespace api_painel_producao.Services {
         Task<ServiceResponse<string>> LoginAsync (UserLoginViewModel user);
         Task<ServiceResponse<string>> DeactivateUserAsync (string token, int userId);
         Task<ServiceResponse<string>> ChangePasswordAsync (string token, int userId, string newPassword, string oldPassword = "");
-        Task<ServiceResponse<T>> ActivateUserAsync (int userId);
+        Task<ServiceResponse<string>> ActivateUserAsync (int userId);
     }
 
 
@@ -41,11 +41,10 @@ namespace api_painel_producao.Services {
 
                 await _repository.CreateAsync(userToAdd);
 
-                var response = new ServiceResponse<int> { Success = true, Message = "User created sucessfully!", Data = userToAdd.Id };
+                return ServiceResponse<int>.Ok(userToAdd.Id, "User created sucessfully!");
 
-                return response;
             } catch (Exception e) {
-                return new ServiceResponse<int> { Success = false, Message = "Error creating user: " + e.Message };
+                return ServiceResponse<int>.Fail("Internal error creating user.");
             }
         }
 
@@ -55,25 +54,19 @@ namespace api_painel_producao.Services {
 
                 string errorMessage = "";
 
-                if (foundUser is null)
-                    errorMessage = "Login failed: incorrect username or password.";
-
-                if (!VerifyPassword(userData.Password, foundUser.PasswordSalt, foundUser.PasswordHash))
-                    errorMessage = "Login failed: incorrect username or password.";
+                if (foundUser is null || !VerifyPassword(userData.Password, foundUser.PasswordSalt, foundUser.PasswordHash))
+                    return ServiceResponse<string>.Fail("Login failed: incorrect username or password.");
 
                 if (!foundUser.IsActive)
-                    errorMessage = "Login failed: your account has been deactivated.";
-
-
-                if (errorMessage != "")
-                    return new ServiceResponse<string> { Success = false, Message = errorMessage };
+                    return ServiceResponse<string>.Fail("Login failed: your account has been deactivated.");
+                    
 
                 var token = _authService.CreateToken(foundUser);
 
-                return new ServiceResponse<string> { Success = true, Message = "Login successful.", Data = token };
+                return ServiceResponse<string>.Ok(token, "Login successful.");
 
             } catch (Exception e) {
-                return new ServiceResponse<string> { Success = false, Message = "Login failed: " + e.Message };
+                return ServiceResponse<string>.Fail("Login failed: internal error.");
             }
         }
 
@@ -82,21 +75,19 @@ namespace api_painel_producao.Services {
             var tokenUser = await _authService.ExtractTokenInfo(token);
 
             if (tokenUser is null)
-                return new ServiceResponse<string> { Success = false, Message = "Action failed: This token is not valid." };
-
+                return ServiceResponse<string>.Fail("Action failed: This token is not valid.");
 
             var userToDeactivate = await _repository.GetByIdAsync(userId);
 
             if (userToDeactivate is null)
-                return new ServiceResponse<string> { Success = false, Message = "Action failed: This user does not exist." };
+                return ServiceResponse<string>.Fail("Action failed: This user does not exist.");
 
             if (tokenUser.Role.ToString() != "Admin" && tokenUser.Id != userId)
-                return new ServiceResponse<string> { Success = false, Message = "Action failed: You do not have the required permissions." };
-
+                return ServiceResponse<string>.DenyPermission();
 
             await _repository.DeactivateUserAsync(userToDeactivate);
 
-            return new ServiceResponse<string> { Success = true, Message = "User has been successfully deactivated." };
+            return ServiceResponse<string>.Ok(null, "User has been successfully deactivated.");
         }
 
         public async Task<ServiceResponse<string>> ChangePasswordAsync (string token, int userId, string newPassword, string oldPassword = "") {
@@ -104,16 +95,16 @@ namespace api_painel_producao.Services {
             var tokenUser = await _authService.ExtractTokenInfo(token);
 
             if (tokenUser is null)
-                return ServiceResponse<T>.Fail("Action failed: This token is not valid.");
+                return ServiceResponse<string>.Fail("Action failed: This token is not valid.");
 
 
             var userToChangePassword = await _repository.GetByIdAsync(userId);
 
             if (tokenUser.Role.ToString() != "Admin" && userToChangePassword.Id != tokenUser.Id)
-                return ServiceResponse<T>.PermissionDenied();
+                return ServiceResponse<string>.DenyPermission();
 
             if (!VerifyPassword(oldPassword, userToChangePassword.PasswordSalt, userToChangePassword.PasswordHash) && tokenUser.Role.ToString() != "Admin")
-                return ServiceResponse<T>.Fail("Action failed: Incorrect password.");
+                return ServiceResponse<string>.Fail("Action failed: Incorrect password.");
 
             var newHashedPassword = GenerateHash(newPassword);
             var info = newHashedPassword.Split(':');
@@ -123,14 +114,15 @@ namespace api_painel_producao.Services {
             return ServiceResponse<string>.Ok(null, "Password has been successfully updated.");
         }
 
-        public async Task<ServiceResponse<T>> ActivateUserAsync (int userId) {
+        public async Task<ServiceResponse<string>> ActivateUserAsync (int userId) {
             var userToActivate = await _repository.GetByIdAsync(userId);
 
             if (userToActivate is null)
-                return ServiceResponse<T>.Fail("Action failed: This user does not exist.");
+                return ServiceResponse<string>.Fail("Action failed: User not found.");
 
-            await _repository.
+            await _repository.ActivateUserAsync(userToActivate);
 
+            return ServiceResponse<string>.Ok("User has been successfully activated.");
         }
 
 
