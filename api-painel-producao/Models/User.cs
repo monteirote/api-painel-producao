@@ -16,5 +16,7 @@ namespace api_painel_producao.Models {
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastModifiedAt { get; set; }
         public DateTime? DeactivatedAt { get; set; }
+
+        public List<Customer> Customers { get; set; }
     }
 }
