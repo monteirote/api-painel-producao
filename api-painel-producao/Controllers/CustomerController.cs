@@ -2,7 +2,10 @@
 using api_painel_producao.ViewModels;
 using api_painel_producao.Models;
 using api_painel_producao.Utils;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace api_painel_producao.Controllers {
@@ -17,7 +20,11 @@ namespace api_painel_producao.Controllers {
             _service = service;
         }
 
+
+        // Endpoints
+
         [HttpGet("{id}")]
+        [Authorize (Roles = "Admin, Vendedor")]
         public async Task<IActionResult> GetCustomerById ([FromRoute] int id) {
 
             ServiceResponse<Customer> response = await _service.GetCustomerById(id);
@@ -29,18 +36,51 @@ namespace api_painel_producao.Controllers {
         }
 
 
-
         [HttpPost]
-        public async Task<IActionResult> CreateCustomer ([FromBody] CreateCustomerViewModel newCustomer) {
+        [Authorize(Roles = "Admin, Vendedor")]
+        public async Task<IActionResult> CreateCustomer ([FromBody] CreateCustomerViewModel newCustomerData) {
 
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-            ServiceResponse<int> response = await _service.CreateCustomerAsync(token, newCustomer);
+            ServiceResponse<int> response = await _service.CreateCustomerAsync(token, newCustomerData);
 
             if (!response.Success)
                 return BadRequest(new { message = response.Message });
 
             return CreatedAtAction(nameof(GetCustomerById), new { îd = response.Data }, new { id = response.Data, message = response.Message });
+        }
+
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin, Vendedor")]
+        public async Task<IActionResult> UpdateCustomer ([FromRoute] int id, [FromBody] UpdateCustomerViewModel newCustomerData) {
+
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ServiceResponse<Customer> response = await _service.UpdateCustomerById(id, token, newCustomerData);
+
+            if (response.PermissionDenied)
+                return Forbid(response.Message);
+
+            if (!response.Success)
+                return BadRequest(response);
+
+            return NoContent();
+        }
+
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin, Vendedor")]
+        public async Task<IActionResult> DeleteCustomer ([FromRoute] int id) { 
+        
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ServiceResponse<int> response = await _service.DeleteCustomer(id, token);
+
+            if (!response.Success)
+                return BadRequest(response.Message);
+
+            return NoContent();
         }
     }
 }

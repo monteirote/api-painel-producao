@@ -29,5 +29,9 @@ namespace api_painel_producao.Models {
 
         [ForeignKey("LastModifiedBy")]
         public int LastModifiedById { get; set; }
+
+        [ForeignKey("DeactivatedBy")]
+        public int DeactivatedById { get; set; }
+
     }
 }

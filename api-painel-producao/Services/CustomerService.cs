@@ -4,12 +4,14 @@ using api_painel_producao.ViewModels;
 using api_painel_producao.Utils;
 using api_painel_producao.Models.Enums;
 
+
 namespace api_painel_producao.Services {
 
     public interface ICustomerService {
         Task<ServiceResponse<int>> CreateCustomerAsync (string token, CreateCustomerViewModel newCustomer);
         Task<ServiceResponse<Customer>> GetCustomerById (int id);
         Task<ServiceResponse<Customer>> UpdateCustomerById (int id, string token, UpdateCustomerViewModel newData);
+        Task<ServiceResponse<int>> DeleteCustomer (int id, string token);
     }
 
     public class CustomerService : ICustomerService {
@@ -21,6 +23,8 @@ namespace api_painel_producao.Services {
             _repository = repository;
             _authService = authService;
         }
+
+
 
         public async Task<ServiceResponse<int>> CreateCustomerAsync (string token, CreateCustomerViewModel newCustomer) { 
             try {
@@ -84,10 +88,31 @@ namespace api_painel_producao.Services {
                 return ServiceResponse<Customer>.Ok(customerFound);
 
             } catch (Exception e) {
-                return ServiceResponse<Customer>.Fail("Failed to update customer.");
+                return ServiceResponse<Customer>.Fail("Action failed: internal error.");
             }
         }
 
+        public async Task<ServiceResponse<int>> DeleteCustomer (int customerId, string token) {
+            try {
+                Customer customerFound = await _repository.GetByIdAsync(customerId);
+
+                var userInfo = await _authService.ExtractTokenInfo(token);
+
+                if (customerFound is null)
+                    return ServiceResponse<int>.Fail("Action failed: This customer does not exist.");
+
+                if (!customerFound.IsActive)
+                    return ServiceResponse<int>.Fail("Action failed: This customer is not active.");
+
+
+                await _repository.DeactivateCustomer(customerId, userInfo.Id);
+
+                return ServiceResponse<int>.Ok();
+
+            } catch {
+                return ServiceResponse<int>.Fail("Action failed: internal error.");
+            }
+        }
 
     }
 }

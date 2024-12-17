@@ -12,11 +12,16 @@ namespace api_painel_producao.Controllers {
     [Route("api/[controller]")]
     public class AccountController : ControllerBase {
 
+
+
         private readonly IAccountService _service;
 
         public AccountController (IAccountService service) {
             _service = service;
         }
+
+
+        // Endpoints
 
         [HttpPost("signup")]
         public async Task<IActionResult> SignUp ([FromBody] UserSignupViewModel userData) {
@@ -62,7 +67,7 @@ namespace api_painel_producao.Controllers {
         public async Task<IActionResult> ActivateAccount ([FromRoute] int id) {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-            ServiceResponse<string> response = await _service.DeactivateUserAsync(token, id);
+            ServiceResponse<string> response = await _service.ActivateUserAsync(token, id);
 
             if (!response.Success)
                 return Unauthorized(response);
@@ -86,6 +91,15 @@ namespace api_painel_producao.Controllers {
                 return BadRequest(response.Message);
 
             return NoContent();
+        }
+
+
+        [HttpGet("pending-approval")]
+        [Authorize (Roles = "Admin")]
+        public async Task<IActionResult> UsersWaitingActivation () {
+            var users = await _service.RetrieveUsersPendingApproval();
+
+            return Ok(users);
         }
     }
 }

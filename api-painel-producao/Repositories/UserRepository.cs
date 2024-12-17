@@ -8,12 +8,14 @@ namespace api_painel_producao.Repositories {
         Task CreateAsync (User user);
         Task UpdateAsync (User user);
         Task DeleteAsync (User user);
-        Task DeactivateUserAsync (User user);
-        Task UpdatePassword (User user, string salt, string hash);
+        Task DeactivateUserAsync (int userId, int tokenId);
+        Task ActivateUserAsync (int userId, int tokenId);
+        Task UpdatePassword (int userId, string[] passwordInfo, int tokenId);
         Task<List<User>> GetAllAsync ();
         Task<User?> GetByIdAsync (int id);
-        Task<User?> GetByUsernameAsync (string username);
-        Task ActivateUserAsync(User user);
+        Task<User?> FindUserByUsernameAsync (string username);
+        Task<User?> FindUserByEmailAsync (string email);
+        Task<List<User>> RetrieveUsersPendingApproval ();
     }
 
     public class UserRepository : IUserRepository {
@@ -28,8 +30,12 @@ namespace api_painel_producao.Repositories {
             return await _context.Users.FindAsync(id);
         }
 
-        public async Task<User?> GetByUsernameAsync (string username) {
+        public async Task<User?> FindUserByUsernameAsync (string username) {
             return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+        }
+
+        public async Task<User?> FindUserByEmailAsync (string email) {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
         }
 
         public async Task<List<User>> GetAllAsync () {
@@ -51,26 +57,50 @@ namespace api_painel_producao.Repositories {
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeactivateUserAsync (User user) {
-            user.IsActive = false;
-            user.DeactivatedAt = DateTime.Now;
+        public async Task DeactivateUserAsync(int userId, int tokenId) {
+            var userToDeactivate = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            var userFromToken = await _context.Users.FirstOrDefaultAsync(x => x.Id == tokenId);
+
+            userToDeactivate.IsActive = false;
+            userToDeactivate.StatusLastModifiedBy = userFromToken;
+            userToDeactivate.StatusLastModifiedById = userFromToken.Id;
+            userToDeactivate.StatusLastModifiedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdatePassword (User user, string salt, string hash) {
-            user.PasswordSalt = salt;
-            user.PasswordHash = hash;
+        public async Task UpdatePassword(int userId, string[] passwordInfo, int tokenId) { 
 
-            user.LastModifiedAt = DateTime.Now;
+            var userToUpdate = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            var userFromToken = await _context.Users.FirstOrDefaultAsync(x => x.Id == tokenId);
+
+            userToUpdate.PasswordSalt = passwordInfo[0];
+            userToUpdate.PasswordHash = passwordInfo[1];
+
+            userToUpdate.DataLastModifiedBy = userFromToken;
+            userToUpdate.DataLastModifiedById = tokenId;
+            userToUpdate.DataLastModifiedAt = DateTime.Now;
+
             await _context.SaveChangesAsync();
         }
 
-        public async Task ActivateUserAsync (User user) {
-            user.IsActive = true;
-            user.LastModifiedAt = DateTime.Now;
+        public async Task ActivateUserAsync (int userId, int tokenId) {
+            var userToActivate = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            var userFromToken = await _context.Users.FirstOrDefaultAsync(x => x.Id == tokenId);
+
+            userToActivate.IsActive = true;
+            userToActivate.StatusLastModifiedBy = userFromToken;
+            userToActivate.StatusLastModifiedById = userFromToken.Id;
+            userToActivate.StatusLastModifiedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<User>> RetrieveUsersPendingApproval () {
+            var usersRetrieved = await _context.Users.Where(x => x.IsActive == false && x.StatusLastModifiedAt == null).ToListAsync();
+
+            return usersRetrieved;
+        }
+
     }
 }

@@ -7,13 +7,13 @@ namespace api_painel_producao.Utils {
 
     public class ServiceResponse<T> {
 
-        public bool Success { get; set; } = true;
+        public bool Success { get; private set; } = true;
 
-        public string Message { get; set; } = string.Empty;
+        public string Message { get; private set; } = string.Empty;
 
-        public bool PermissionDenied { get; set; } = false;
+        public bool PermissionDenied { get; private set; } = false;
 
-        public T? Data { get; set; } = default;
+        public T? Data { get; private set; } = default;
 
 
         private ServiceResponse (bool success, string message, T? data = default) {
@@ -24,6 +24,10 @@ namespace api_painel_producao.Utils {
 
         public static ServiceResponse<T> Ok (T data, string message = "Operação bem-sucedida.") {
             return new ServiceResponse<T>(true, message, data);
+        }
+
+        public static ServiceResponse<T> Ok (string message = "Operação bem-sucedida.") {
+            return new ServiceResponse<T> { Success = true, Message = message };
         }
 
         public static ServiceResponse<T> Fail (string message) {

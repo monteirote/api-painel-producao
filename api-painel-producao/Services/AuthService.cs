@@ -54,18 +54,18 @@ namespace api_painel_producao.Services {
 
             try {
                 info = tokenHandler.ValidateToken(token, new TokenValidationParameters {
-                    ValidateIssuer = true,
+                    ValidateIssuer = false,
                     ValidateIssuerSigningKey = true,
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                 }, out var validatedToken);
 
-            } catch (Exception) {
+            } catch (Exception e) {
                 return null;
             }
 
-            var tokenUser = await _userRepository.GetByUsernameAsync(info.FindFirst("username")?.Value);
+            var tokenUser = await _userRepository.FindUserByUsernameAsync(info.FindFirst("username")?.Value);
 
             if (tokenUser is null)
                 return null;
@@ -77,7 +77,7 @@ namespace api_painel_producao.Services {
                 Username = tokenUser.Username,
                 Role = tokenUser.Role,
                 CreatedAt = tokenUser.CreatedAt,
-                LastModifiedAt = tokenUser.LastModifiedAt
+                LastModifiedAt = tokenUser.DataLastModifiedAt
             };
             
             return userInfo;

@@ -12,7 +12,8 @@ namespace api_painel_producao.Services {
         Task<ServiceResponse<string>> LoginAsync (UserLoginViewModel user);
         Task<ServiceResponse<string>> DeactivateUserAsync (string token, int userId);
         Task<ServiceResponse<string>> ChangePasswordAsync (string token, int userId, string newPassword, string oldPassword = "");
-        Task<ServiceResponse<string>> ActivateUserAsync (int userId);
+        Task<ServiceResponse<string>> ActivateUserAsync (string token, int userId);
+        Task<ServiceResponse<List<PendingApprovalUserViewModel>>> RetrieveUsersPendingApproval ();
     }
 
 
@@ -21,6 +22,8 @@ namespace api_painel_producao.Services {
         private readonly IUserRepository _repository;
         private readonly IAuthService _authService;
 
+
+
         public AccountService (IUserRepository repository, IAuthService authService) {
             _repository = repository;
             _authService = authService;
@@ -28,15 +31,24 @@ namespace api_painel_producao.Services {
 
         public async Task<ServiceResponse<int>> CreateUserAsync (UserSignupViewModel userData) {
             try {
+
+                if (_repository.FindUserByEmailAsync(userData.Email) != null)
+                    return ServiceResponse<int>.Fail("Action failed: An account with this email already exists.");
+
+                if (_repository.FindUserByUsernameAsync(userData.Username) != null)
+                    return ServiceResponse<int>.Fail("Action failed: An account with this username already exists.");
+
                 var parts = GenerateHash(userData.Password).Split(':');
 
                 var userToAdd = new User {
                     Name = userData.Name,
                     Email = userData.Email,
                     Username = userData.Username,
+                    Role = Models.Enums.UserRole.Vendedor,
                     PasswordSalt = parts[0],
                     PasswordHash = parts[1],
-                    Role = Models.Enums.UserRole.Admin,
+                    CreatedAt = DateTime.Now,
+                    IsActive = false
                 };
 
                 await _repository.CreateAsync(userToAdd);
@@ -50,7 +62,7 @@ namespace api_painel_producao.Services {
 
         public async Task<ServiceResponse<string>> LoginAsync (UserLoginViewModel userData) {
             try {
-                var foundUser = await _repository.GetByUsernameAsync(userData.Username);
+                var foundUser = await _repository.FindUserByUsernameAsync(userData.Username);
 
                 string errorMessage = "";
 
@@ -85,7 +97,7 @@ namespace api_painel_producao.Services {
             if (tokenUser.Role.ToString() != "Admin" && tokenUser.Id != userId)
                 return ServiceResponse<string>.DenyPermission();
 
-            await _repository.DeactivateUserAsync(userToDeactivate);
+            await _repository.DeactivateUserAsync(userToDeactivate.Id, tokenUser.Id);
 
             return ServiceResponse<string>.Ok(null, "User has been successfully deactivated.");
         }
@@ -107,23 +119,43 @@ namespace api_painel_producao.Services {
                 return ServiceResponse<string>.Fail("Action failed: Incorrect password.");
 
             var newHashedPassword = GenerateHash(newPassword);
-            var info = newHashedPassword.Split(':');
+            string[] passwordData = newHashedPassword.Split(':');
 
-            await _repository.UpdatePassword(userToChangePassword, info[0], info[1]);
+            await _repository.UpdatePassword(userId, passwordData, tokenUser.Id);
 
             return ServiceResponse<string>.Ok(null, "Password has been successfully updated.");
         }
 
-        public async Task<ServiceResponse<string>> ActivateUserAsync (int userId) {
+        public async Task<ServiceResponse<string>> ActivateUserAsync (string token, int userId) {
             var userToActivate = await _repository.GetByIdAsync(userId);
+
+            var tokenInfo = await _authService.ExtractTokenInfo(token);
 
             if (userToActivate is null)
                 return ServiceResponse<string>.Fail("Action failed: User not found.");
 
-            await _repository.ActivateUserAsync(userToActivate);
+            await _repository.ActivateUserAsync(userId, tokenInfo.Id);
 
             return ServiceResponse<string>.Ok("User has been successfully activated.");
         }
+
+        public async Task<ServiceResponse<List<PendingApprovalUserViewModel>>> RetrieveUsersPendingApproval () {
+
+            var usersRetrieved = await _repository.RetrieveUsersPendingApproval();
+
+            var results = usersRetrieved.Select(x => {
+                return new PendingApprovalUserViewModel {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email,
+                    Username = x.Username,
+                    CreatedAt = x.CreatedAt
+                };
+            }).ToList();
+
+            return ServiceResponse<List<PendingApprovalUserViewModel>>.Ok(results);
+        }
+
 
 
         private static string GenerateHash (string password) {
