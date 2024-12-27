@@ -1,5 +1,6 @@
 ﻿using api_painel_producao.Services;
 using api_painel_producao.ViewModels;
+using api_painel_producao.DTOs;
 using api_painel_producao.Models;
 using api_painel_producao.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -22,6 +23,17 @@ namespace api_painel_producao.Controllers {
 
 
         // Endpoints
+
+        [HttpGet]
+        [Authorize (Roles = "Admin, Vendedor")]
+        public async Task<IActionResult> GetAllCustomersAsync () {
+
+            ServiceResponse<List<CustomerDTO>> foundCustomers = await _service.FindAllCustomersAsync();
+
+            return Ok(foundCustomers);
+        }
+
+
 
         [HttpGet("{id}")]
         [Authorize (Roles = "Admin, Vendedor")]
@@ -47,7 +59,7 @@ namespace api_painel_producao.Controllers {
             if (!response.Success)
                 return BadRequest(new { message = response.Message });
 
-            return CreatedAtAction(nameof(GetCustomerById), new { îd = response.Data }, new { id = response.Data, message = response.Message });
+            return CreatedAtAction(nameof(GetCustomerById), new { id = response.Data }, new { id = response.Data, message = response.Message });
         }
 
 

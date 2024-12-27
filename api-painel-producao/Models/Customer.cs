@@ -22,16 +22,17 @@ namespace api_painel_producao.Models {
         public User? LastModifiedBy { get; set; }
         public DateTime? LastModifiedAt { get; set; }
 
+        public List<Order> Orders { get; set; }
 
 
         [ForeignKey("CreatedBy")]
         public int CreatedById { get; set; }
 
         [ForeignKey("LastModifiedBy")]
-        public int LastModifiedById { get; set; }
+        public int? LastModifiedById { get; set; }
 
         [ForeignKey("DeactivatedBy")]
-        public int DeactivatedById { get; set; }
+        public int? DeactivatedById { get; set; }
 
     }
 }

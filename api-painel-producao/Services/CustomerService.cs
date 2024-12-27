@@ -3,7 +3,7 @@ using api_painel_producao.Models;
 using api_painel_producao.ViewModels;
 using api_painel_producao.Utils;
 using api_painel_producao.Models.Enums;
-
+using api_painel_producao.DTOs;
 
 namespace api_painel_producao.Services {
 
@@ -12,6 +12,7 @@ namespace api_painel_producao.Services {
         Task<ServiceResponse<Customer>> GetCustomerById (int id);
         Task<ServiceResponse<Customer>> UpdateCustomerById (int id, string token, UpdateCustomerViewModel newData);
         Task<ServiceResponse<int>> DeleteCustomer (int id, string token);
+        Task<ServiceResponse<List<CustomerDTO>>> FindAllCustomersAsync ();
     }
 
     public class CustomerService : ICustomerService {
@@ -25,42 +26,47 @@ namespace api_painel_producao.Services {
         }
 
 
-
-        public async Task<ServiceResponse<int>> CreateCustomerAsync (string token, CreateCustomerViewModel newCustomer) { 
+        public async Task<ServiceResponse<int>> CreateCustomerAsync (string token, CreateCustomerViewModel newCustomerData) {
             try {
 
-                var userInfo = _authService.ExtractTokenInfo(token);
+                var userData = await _authService.ExtractTokenInfo(token);
 
-                var customerToAdd = new Customer {
-                    Name = newCustomer.Name,
-                    Email = newCustomer.Email,
-                    PhoneNumber = newCustomer.PhoneNumber,
-                    IsActive = true,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedById = userInfo.Id 
-                };
+                var customerToAdd = CustomerDTO.Create(newCustomerData);
 
-                await _repository.CreateAsync(customerToAdd);
+                await _repository.CreateAsync(customerToAdd, userData.Id);
 
                 return ServiceResponse<int>.Ok(customerToAdd.Id, "Customer created successfully.");
+
 
             } catch (Exception e) {
                 return ServiceResponse<int>.Fail("Failed to create customer.");
             }
         }
 
-        public async Task<ServiceResponse<Customer>> GetCustomerById (int id) { 
+        public async Task<ServiceResponse<List<CustomerDTO>>> FindAllCustomersAsync () { 
+            try {
+
+                var allCustomers = await _repository.FindAllCustomersAsync ();
+
+                return ServiceResponse<List<CustomerDTO>>.Ok(customersFound);
+
+            } catch (Exception e) {
+                ServiceResponse<List<CustomerDTO>>.Fail("Action failed: internal error.");
+            }
+        }
+
+        public async Task<ServiceResponse<CustomerDTO>> GetCustomerById (int id) { 
             try {
 
                 var customerFound = await _repository.GetByIdAsync(id);
 
                 if (customerFound is null)
-                    return ServiceResponse<Customer>.Fail("Action failed: This customer does not exist.");
+                    return ServiceResponse<CustomerDTO>.Fail("Action failed: This customer does not exist.");
 
-                return ServiceResponse<Customer>.Ok(customerFound);
+                return ServiceResponse<CustomerDTO>.Ok(customerFound);
 
             } catch (Exception e) {
-                return ServiceResponse<Customer>.Fail("Failed to find customer.");
+                return ServiceResponse<CustomerDTO>.Fail("Action failed: internal error.");
             }
         }
 
@@ -86,6 +92,28 @@ namespace api_painel_producao.Services {
                 await _repository.UpdateCustomer(customerFound);
 
                 return ServiceResponse<Customer>.Ok(customerFound);
+
+            } catch (Exception e) {
+                return ServiceResponse<Customer>.Fail("Action failed: internal error.");
+            }
+        }
+
+        public async Task<ServiceResponse<CustomerDTO>> UpdateCustomerById (int customerId, UpdateCustomerViewModel customerData, string token) { 
+            try {
+
+                var tokenData = await _authService.ExtractTokenInfo(token);
+
+                if (customerId != tokenData.Id && tokenData.Role != "Admin")
+                    return ServiceResponse<CustomerDTO>.DenyPermission();
+
+
+                var customerFound = await _repository.GetByIdAsync(customerId);
+
+                if (customerFound is null)
+                    return ServiceResponse<CustomerDTO>.Fail("Action failed: This customer does not exist.");
+
+
+
 
             } catch (Exception e) {
                 return ServiceResponse<Customer>.Fail("Action failed: internal error.");

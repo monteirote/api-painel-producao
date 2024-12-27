@@ -12,7 +12,7 @@ namespace api_painel_producao.Repositories {
         Task ActivateUserAsync (int userId, int tokenId);
         Task UpdatePassword (int userId, string[] passwordInfo, int tokenId);
         Task<List<User>> GetAllAsync ();
-        Task<User?> GetByIdAsync (int id);
+        Task<User?> FindUserByIdAsync (int id);
         Task<User?> FindUserByUsernameAsync (string username);
         Task<User?> FindUserByEmailAsync (string email);
         Task<List<User>> RetrieveUsersPendingApproval ();
@@ -26,7 +26,9 @@ namespace api_painel_producao.Repositories {
             _context = context;
         }
 
-        public async Task<User?> GetByIdAsync (int id) {
+
+
+        public async Task<User?> FindUserByIdAsync(int id) {
             return await _context.Users.FindAsync(id);
         }
 

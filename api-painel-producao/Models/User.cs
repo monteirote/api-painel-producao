@@ -35,8 +35,14 @@ namespace api_painel_producao.Models {
 
         public List<Customer> DeactivatedCustomers { get; set; } = new List<Customer>();
 
+
         public List<User> ModifiedUsersStatus { get; set; } = new List<User>();
 
         public List<User> ModifiedUsersData { get; set; } = new List<User>();
+
+
+        public List<Order> CreatedOrders { get; set; } = new List<Order>();
+        public List<Order> ModifiedOrders { get; set; } = new List<Order>();
+        public List<Order> CanceledOrders { get; set; } = new List<Order>();
     }
 }

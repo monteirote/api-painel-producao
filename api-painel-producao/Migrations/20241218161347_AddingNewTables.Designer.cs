@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api_painel_producao.Data;
 
@@ -10,9 +11,11 @@ using api_painel_producao.Data;
 namespace api_painel_producao.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241218161347_AddingNewTables")]
+    partial class AddingNewTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -32,7 +35,7 @@ namespace api_painel_producao.Migrations
                     b.Property<DateTime?>("DeactivatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("DeactivatedById")
+                    b.Property<int>("DeactivatedById")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
@@ -44,7 +47,7 @@ namespace api_painel_producao.Migrations
                     b.Property<DateTime?>("LastModifiedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("LastModifiedById")
+                    b.Property<int>("LastModifiedById")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -101,9 +104,6 @@ namespace api_painel_producao.Migrations
 
                     b.Property<int>("PaperId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("TEXT");
 
                     b.Property<float>("Width")
                         .HasColumnType("REAL");
@@ -186,9 +186,6 @@ namespace api_painel_producao.Migrations
 
                     b.Property<string>("Reference")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("TotalPrice")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -280,12 +277,14 @@ namespace api_painel_producao.Migrations
                     b.HasOne("api_painel_producao.Models.User", "DeactivatedBy")
                         .WithMany("DeactivatedCustomers")
                         .HasForeignKey("DeactivatedById")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
 
                     b.HasOne("api_painel_producao.Models.User", "LastModifiedBy")
                         .WithMany("ModifiedCustomers")
                         .HasForeignKey("LastModifiedById")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
 
                     b.Navigation("CreatedBy");
 

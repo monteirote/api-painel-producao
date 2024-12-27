@@ -89,7 +89,7 @@ namespace api_painel_producao.Services {
             if (tokenUser is null)
                 return ServiceResponse<string>.Fail("Action failed: This token is not valid.");
 
-            var userToDeactivate = await _repository.GetByIdAsync(userId);
+            var userToDeactivate = await _repository.FindUserByIdAsync(userId);
 
             if (userToDeactivate is null)
                 return ServiceResponse<string>.Fail("Action failed: This user does not exist.");
@@ -110,7 +110,7 @@ namespace api_painel_producao.Services {
                 return ServiceResponse<string>.Fail("Action failed: This token is not valid.");
 
 
-            var userToChangePassword = await _repository.GetByIdAsync(userId);
+            var userToChangePassword = await _repository.FindUserByIdAsync(userId);
 
             if (tokenUser.Role.ToString() != "Admin" && userToChangePassword.Id != tokenUser.Id)
                 return ServiceResponse<string>.DenyPermission();
@@ -127,12 +127,16 @@ namespace api_painel_producao.Services {
         }
 
         public async Task<ServiceResponse<string>> ActivateUserAsync (string token, int userId) {
-            var userToActivate = await _repository.GetByIdAsync(userId);
+
+            var userToActivate = await _repository.FindUserByIdAsync(userId);
 
             var tokenInfo = await _authService.ExtractTokenInfo(token);
 
             if (userToActivate is null)
                 return ServiceResponse<string>.Fail("Action failed: User not found.");
+
+            if (userToActivate.IsActive)
+                return ServiceResponse<string>.Fail("Action failed: User is already active.");
 
             await _repository.ActivateUserAsync(userId, tokenInfo.Id);
 

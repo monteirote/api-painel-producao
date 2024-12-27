@@ -9,6 +9,9 @@ namespace api_painel_producao.Data {
 
         public DbSet<User> Users { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Material> Materials { get; set; }
+        public DbSet<FramedArtwork> FramedArtworks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +40,7 @@ namespace api_painel_producao.Data {
                 .OnDelete(DeleteBehavior.SetNull);
 
 
+
             // Customer
             modelBuilder.Entity<Customer>()
                 .HasOne(c => c.CreatedBy)
@@ -55,6 +59,37 @@ namespace api_painel_producao.Data {
                 .WithMany(u => u.DeactivatedCustomers)
                 .HasForeignKey(c => c.DeactivatedById)
                 .OnDelete(DeleteBehavior.SetNull);
+
+
+
+            // Order
+            modelBuilder.Entity<Order>()
+                .HasIndex(o => o.Reference)
+                .IsUnique();
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.CreatedBy)
+                .WithMany(u => u.CreatedOrders)
+                .HasForeignKey(o => o.CreatedById)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.CreatedFor)
+                .WithMany(c => c.Orders)
+                .HasForeignKey(o => o.CreatedForId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.LastModifiedBy)
+                .WithMany(u => u.ModifiedOrders)
+                .HasForeignKey(o => o.LastModifiedById)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Order>()
+               .HasOne(o => o.CanceledBy)
+               .WithMany(u => u.CanceledOrders)
+               .HasForeignKey(o => o.CanceledById)
+               .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
