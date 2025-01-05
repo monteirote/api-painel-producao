@@ -39,7 +39,7 @@ namespace api_painel_producao.Controllers {
         [Authorize (Roles = "Admin, Vendedor")]
         public async Task<IActionResult> GetCustomerById ([FromRoute] int id) {
 
-            ServiceResponse<Customer> response = await _service.GetCustomerById(id);
+            ServiceResponse<CustomerDTO> response = await _service.GetCustomerById(id);
 
             if (!response.Success)
                 return NotFound(response);
@@ -52,7 +52,7 @@ namespace api_painel_producao.Controllers {
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> CreateCustomer ([FromBody] CreateCustomerViewModel newCustomerData) {
 
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
             ServiceResponse<int> response = await _service.CreateCustomerAsync(token, newCustomerData);
 
@@ -67,7 +67,7 @@ namespace api_painel_producao.Controllers {
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> UpdateCustomer ([FromRoute] int id, [FromBody] UpdateCustomerViewModel newCustomerData) {
 
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
             ServiceResponse<Customer> response = await _service.UpdateCustomerById(id, token, newCustomerData);
 
@@ -85,7 +85,7 @@ namespace api_painel_producao.Controllers {
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> DeleteCustomer ([FromRoute] int id) { 
         
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
             ServiceResponse<int> response = await _service.DeleteCustomer(id, token);
 

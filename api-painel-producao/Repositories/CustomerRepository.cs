@@ -10,11 +10,11 @@ namespace api_painel_producao.Repositories {
         Task CreateAsync (CustomerDTO customer, int tokenId);
 
         Task<CustomerDTO?> GetByIdAsync (int id);
+
         Task<List<CustomerDTO>> FindAllCustomersAsync();
 
-        Task UpdateCustomer (CustomerDTO newData);
-
-        Task DeleteCustomer (int objectId, int userId);
+        Task UpdateCustomer (CustomerDTO newData, int tokenId);
+        Task DeactivateCustomer (int objectId, int userId);
     }
 
     public class CustomerRepository : ICustomerRepository {
@@ -106,7 +106,7 @@ namespace api_painel_producao.Repositories {
             customer.DeactivatedById = user.Id;
             customer.DeactivatedAt = DateTime.Now;
 
-            user.DeactivatedCustomers.Add(user);
+            user.DeactivatedCustomers.Add(customer);
 
             await _context.SaveChangesAsync();
         }

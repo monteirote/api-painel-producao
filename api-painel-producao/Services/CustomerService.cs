@@ -9,7 +9,7 @@ namespace api_painel_producao.Services {
 
     public interface ICustomerService {
         Task<ServiceResponse<int>> CreateCustomerAsync (string token, CreateCustomerViewModel newCustomer);
-        Task<ServiceResponse<Customer>> GetCustomerById (int id);
+        Task<ServiceResponse<CustomerDTO>> GetCustomerById (int id);
         Task<ServiceResponse<Customer>> UpdateCustomerById (int id, string token, UpdateCustomerViewModel newData);
         Task<ServiceResponse<int>> DeleteCustomer (int id, string token);
         Task<ServiceResponse<List<CustomerDTO>>> FindAllCustomersAsync ();
@@ -46,12 +46,12 @@ namespace api_painel_producao.Services {
         public async Task<ServiceResponse<List<CustomerDTO>>> FindAllCustomersAsync () { 
             try {
 
-                var allCustomers = await _repository.FindAllCustomersAsync ();
+                var allCustomers = await _repository.FindAllCustomersAsync();
 
-                return ServiceResponse<List<CustomerDTO>>.Ok(customersFound);
+                return ServiceResponse<List<CustomerDTO>>.Ok(allCustomers);
 
             } catch (Exception e) {
-                ServiceResponse<List<CustomerDTO>>.Fail("Action failed: internal error.");
+                return ServiceResponse<List<CustomerDTO>>.Fail("Action failed: internal error.");
             }
         }
 
@@ -70,32 +70,33 @@ namespace api_painel_producao.Services {
             }
         }
 
-        public async Task<ServiceResponse<Customer>> UpdateCustomerById (int id, string token, UpdateCustomerViewModel newData) {  
-            try {
-                var userInfo = await _authService.ExtractTokenInfo(token);
+        public async Task<ServiceResponse<Customer>> UpdateCustomerById (int id, string token, UpdateCustomerViewModel newData) {
+            // transferir lógica de manipulação do model p/ rep.
+            //try {
+            //    var userInfo = await _authService.ExtractTokenInfo(token);
 
-                var customerFound = await _repository.GetByIdAsync(id);
+            //    var customerFound = await _repository.GetByIdAsync(id);
 
-                if (customerFound is null)
-                    return ServiceResponse<Customer>.Fail("Action failed: This customer does not exist.");
+            //    if (customerFound is null)
+            //        return ServiceResponse<Customer>.Fail("Action failed: This customer does not exist.");
 
-                if (userInfo.Role != UserRole.Admin && userInfo.Id != customerFound.Id)
-                    return ServiceResponse<Customer>.DenyPermission();
+            //    if (userInfo.Role != UserRole.Admin && userInfo.Id != customerFound.Id)
+            //        return ServiceResponse<Customer>.DenyPermission();
 
-                customerFound.Name = newData.Name ?? customerFound.Name;
-                customerFound.Email = newData.Email ?? customerFound.Email;
-                customerFound.PhoneNumber = newData.PhoneNumber ?? customerFound.PhoneNumber;
+            //    customerFound.Name = newData.Name ?? customerFound.Name;
+            //    customerFound.Email = newData.Email ?? customerFound.Email;
+            //    customerFound.PhoneNumber = newData.PhoneNumber ?? customerFound.PhoneNumber;
 
-                customerFound.LastModifiedById = userInfo.Id;
-                customerFound.LastModifiedAt = DateTime.Now;
+            //    customerFound.LastModifiedById = userInfo.Id;
+            //    customerFound.LastModifiedAt = DateTime.Now;
 
-                await _repository.UpdateCustomer(customerFound);
+            //    await _repository.UpdateCustomer(customerFound);
 
-                return ServiceResponse<Customer>.Ok(customerFound);
+            //    return ServiceResponse<Customer>.Ok(customerFound);
 
-            } catch (Exception e) {
+            //} catch (Exception e) {
                 return ServiceResponse<Customer>.Fail("Action failed: internal error.");
-            }
+            //}
         }
 
         public async Task<ServiceResponse<CustomerDTO>> UpdateCustomerById (int customerId, UpdateCustomerViewModel customerData, string token) { 
@@ -103,7 +104,7 @@ namespace api_painel_producao.Services {
 
                 var tokenData = await _authService.ExtractTokenInfo(token);
 
-                if (customerId != tokenData.Id && tokenData.Role != "Admin")
+                if (customerId != tokenData.Id && tokenData.Role.ToString() != "Admin")
                     return ServiceResponse<CustomerDTO>.DenyPermission();
 
 
@@ -112,17 +113,19 @@ namespace api_painel_producao.Services {
                 if (customerFound is null)
                     return ServiceResponse<CustomerDTO>.Fail("Action failed: This customer does not exist.");
 
+                var customerDTO = CustomerDTO.Create(customerData);
 
+                await _repository.UpdateCustomer(customerDTO, tokenData.Id);
 
-
+                return ServiceResponse<CustomerDTO>.Ok();
             } catch (Exception e) {
-                return ServiceResponse<Customer>.Fail("Action failed: internal error.");
+                return ServiceResponse<CustomerDTO>.Fail("Action failed: internal error.");
             }
         }
 
         public async Task<ServiceResponse<int>> DeleteCustomer (int customerId, string token) {
             try {
-                Customer customerFound = await _repository.GetByIdAsync(customerId);
+                var customerFound = await _repository.GetByIdAsync(customerId);
 
                 var userInfo = await _authService.ExtractTokenInfo(token);
 
