@@ -2,12 +2,15 @@
 using api_painel_producao.Repositories;
 using api_painel_producao.Utils;
 using api_painel_producao.ViewModels;
+using api_painel_producao.Models.Enums;
 
 namespace api_painel_producao.Services {
 
     public interface IMaterialService {
         Task<ServiceResponse<int>> CreateMaterialAsync (CreateMaterialViewModel material);
         Task<ServiceResponse<MaterialDTO>> GetMaterialByIdAsync (int id);
+        Task<ServiceResponse<List<MaterialDTO>>> GetMaterialsByType (string type);
+        Task<ServiceResponse<int>> DeleteMaterialById (int id);
     }
 
     public class MaterialService : IMaterialService {
@@ -43,6 +46,40 @@ namespace api_painel_producao.Services {
 
             } catch (Exception e) {
                 return ServiceResponse<MaterialDTO>.Fail("Action failed: internal error");
+            }
+        }
+
+        public async Task<ServiceResponse<List<MaterialDTO>>> GetMaterialsByType (string type) { 
+            try {
+
+                bool typeIsValid = Enum.TryParse(type, out MaterialType typeEnum);
+
+                if (!typeIsValid)
+                    return ServiceResponse<List<MaterialDTO>>.Fail("Action failed: this type does not exist.");
+
+                var results = await _repository.GetMaterialsByType(typeEnum);
+
+                return ServiceResponse<List<MaterialDTO>>.Ok(results);
+
+            } catch (Exception e) {
+                return ServiceResponse<List<MaterialDTO>>.Fail("Action failed: internal error");
+            }
+        }
+
+        public async Task<ServiceResponse<int>> DeleteMaterialById (int id) { 
+            try {
+
+                var materialFound = await _repository.GetMaterialById(id);
+
+                if (materialFound is null)
+                    return ServiceResponse<int>.Fail("Action failed: this material does not exist");
+
+                await _repository.DeleteMaterial(id);
+
+                return ServiceResponse<int>.Ok();
+
+            } catch (Exception e) {
+                return ServiceResponse<int>.Fail("Action failed: internal error");
             }
         }
     }

@@ -9,10 +9,14 @@ namespace api_painel_producao.Controllers {
 
     [ApiController]
     [Route("api/[controller]")]
-    public class MaterialController (IMaterialService service) : ControllerBase {
+    public class MaterialController : ControllerBase {
 
+        private readonly IMaterialService _service;
+            
+        public MaterialController (IMaterialService service) {
+            _service = service;
+        }
 
-        private readonly IMaterialService _service = service;
 
         [HttpPost]
         [Authorize (Roles = "Admin, Vendedor")]
@@ -27,7 +31,7 @@ namespace api_painel_producao.Controllers {
         }
 
 
-        [HttpGet("/{id}")]
+        [HttpGet("{id}")]
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> GetMaterialById ([FromRoute] int id) {
 
@@ -38,5 +42,32 @@ namespace api_painel_producao.Controllers {
             
             return Ok(response);
         }
+
+
+        [HttpGet]
+        [Authorize(Roles = "Admin, Vendedor")]
+        public async Task<IActionResult> GetMaterialsByType ([FromQuery] string type) {
+
+            ServiceResponse<List<MaterialDTO>> response = await _service.GetMaterialsByType(type);
+
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+
+        [HttpDelete]
+        [Authorize (Roles = "Admin, Vendedor")]
+        public async Task<IActionResult> DeleteMaterialById ([FromRoute] int id) {
+
+            ServiceResponse<int> response = await _service.DeleteMaterialById(id);
+
+            if (!response.Success)
+                return NotFound();
+
+            return NoContent();
+        }
     }
 }
+

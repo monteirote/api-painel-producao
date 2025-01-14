@@ -10,7 +10,6 @@ namespace api_painel_producao.ViewModels {
         public string Name { get; set; } = string.Empty;
 
 
-        [Required]
         public string Description { get; set; } = string.Empty;
 
 
@@ -24,7 +23,9 @@ namespace api_painel_producao.ViewModels {
         public string MeasurementUnit { get; set; } = string.Empty;
 
 
-        [Required]
+        [Required(ErrorMessage = "Action failed: the value of 'ValueByUnit' is not valid.")]
+        [Range(0.01, 1000000.00, ErrorMessage = "Action failed: the value of 'ValueByUnit' is not valid.")]
+        [DataType(DataType.Currency)]
         public decimal ValueByUnit { get; set; } = 0;
 
     }

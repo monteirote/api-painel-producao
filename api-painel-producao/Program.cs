@@ -36,18 +36,21 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 
+builder.Services.AddScoped<IMaterialRepository, MaterialRepository>();
+builder.Services.AddScoped<IMaterialService, MaterialService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-
 var app = builder.Build();
-
-app.MapControllers();
-app.UseAuthentication();
-app.UseAuthorization();
 
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
