@@ -1,4 +1,5 @@
 ﻿using api_painel_producao.Models;
+using api_painel_producao.ViewModels;
 
 namespace api_painel_producao.DTOs {
     public class MaterialDTO {
@@ -18,6 +19,34 @@ namespace api_painel_producao.DTOs {
             this.Type = materialData.Type.ToString();
             this.MeasurementUnit = materialData.MeasurementUnit.ToString();
             this.ValueByUnit = materialData.ValueByUnit;
+        }
+
+        public MaterialDTO () { }
+
+        public static MaterialDTO Create (CreateMaterialViewModel material) {
+
+            if (material is null) return null;
+
+            return new MaterialDTO {
+                Name = material.Name,
+                Description = material.Description,
+                Type = material.Type,
+                MeasurementUnit = material.MeasurementUnit,
+                ValueByUnit = material.ValueByUnit
+            };
+        }
+
+        public static MaterialDTO Create (Material material) {
+
+            if (material is null) return null;
+
+            return new MaterialDTO {
+                Name = material.Name,
+                Description = material.Description,
+                Type = material.Type.ToString(),
+                MeasurementUnit = material.MeasurementUnit.ToString(),
+                ValueByUnit = material.ValueByUnit,
+            };
         }
     }
 }

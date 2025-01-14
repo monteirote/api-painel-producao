@@ -22,9 +22,8 @@ namespace api_painel_producao.Validators
             string stringValue = value.ToString();
 
             if (Enum.IsDefined(_enumType, stringValue))
-            {
                 return ValidationResult.Success;
-            }
+            
 
             return new ValidationResult($"The value '{stringValue}' is not valid for the enum {_enumType.Name}.");
         }
