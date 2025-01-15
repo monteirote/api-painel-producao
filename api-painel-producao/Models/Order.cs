@@ -12,7 +12,7 @@ namespace api_painel_producao.Models {
 
         public Priority Priority { get; set; }
 
-        public List<FramedArtwork> FramedArtworks { get; set; }
+        public List<FramedArtwork> FramedArtworks { get; set; } = [];
 
 
         public DateTime CreatedAt { get; set; }

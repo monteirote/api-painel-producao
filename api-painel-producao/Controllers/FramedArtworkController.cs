@@ -30,6 +30,7 @@ namespace api_painel_producao.Controllers {
             return CreatedAtAction(nameof(GetArtworkById), new { id = response.Data }, new { id = response.Data, message = response.Message });
         }
 
+
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> GetArtworkById ([FromRoute] int id) { 
