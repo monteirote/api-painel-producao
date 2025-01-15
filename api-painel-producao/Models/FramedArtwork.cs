@@ -8,13 +8,13 @@
 
         public decimal TotalPrice { get; set; }
 
-        public byte[] ImageFile { get; set; }
-        public string ImageFilePath { get; set; }
-        public string ImageDescription { get; set; }
+        public byte[] ImageFile { get; set; } = [];
+        public string ImageFilePath { get; set; } = string.Empty;
+        public string ImageDescription { get; set; } = string.Empty;
 
-        public Material Glass { get; set; }
-        public Material Frame { get; set; }
-        public Material Background { get; set; }
-        public Material Paper { get; set; }
+        public Material? Glass { get; set; }
+        public Material? Frame { get; set; }
+        public Material? Background { get; set; }
+        public Material? Paper { get; set; }
     }
 }

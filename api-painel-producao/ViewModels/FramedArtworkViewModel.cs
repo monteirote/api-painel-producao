@@ -23,15 +23,15 @@ namespace api_painel_producao.ViewModels {
         public decimal Price { get; set; }
         
 
-        public int GlassId { get; set; }
+        public int? GlassId { get; set; }
 
 
-        public int FrameId { get; set; }
+        public int? FrameId { get; set; }
 
 
-        public int BackgroundId { get; set; }
+        public int? BackgroundId { get; set; }
 
 
-        public int PaperId { get; set; }
+        public int? PaperId { get; set; }
     }
 }

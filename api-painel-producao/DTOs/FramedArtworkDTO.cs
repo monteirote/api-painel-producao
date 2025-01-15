@@ -42,13 +42,16 @@ namespace api_painel_producao.DTOs {
             return new FramedArtworkDTO {
                 Height = framedArtwork.Height,
                 Width = framedArtwork.Width,
-                GlassId = framedArtwork.GlassId,
-                FrameId = framedArtwork.FrameId,
-                BackgroundId = framedArtwork.BackgroundId,
-                PaperId = framedArtwork.PaperId,
+                GlassId = framedArtwork.GlassId ?? 0,
+                FrameId = framedArtwork.FrameId ?? 0,
+                BackgroundId = framedArtwork.BackgroundId ?? 0,
+                PaperId = framedArtwork.PaperId ?? 0,
             };
         }
 
+        public static FramedArtworkDTO Create (FramedArtwork framedArtworkData) {
+            return framedArtworkData is null ? null : new FramedArtworkDTO (framedArtworkData);
+        }
     }
 
 }
