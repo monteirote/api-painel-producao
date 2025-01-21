@@ -1,9 +1,10 @@
 ﻿using api_painel_producao.Models;
+using api_painel_producao.ViewModels;
 
 namespace api_painel_producao.DTOs {
 
     public class OrderDTO {
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         public string Reference { get; set; }
         public string Priority { get; set; }
@@ -16,15 +17,15 @@ namespace api_painel_producao.DTOs {
         public DateTime CreatedAt { get; set; }
         public UserDTO CreatedBy { get; set; }
         public CustomerDTO CreatedFor { get; set; }
-
+        public int CreatedForId { get; set; }
 
         public DateTime? LastModifiedAt { get; set; }
-        public UserDTO LastModifiedBy { get; set; }
+        public UserDTO? LastModifiedBy { get; set; }
 
 
         public DateTime? CanceledAt { get; set; }
         public UserDTO? CanceledBy { get; set; }
-
+        public OrderDTO() { }
         public OrderDTO (Order orderData) {
 
             this.Id = orderData.Id;
@@ -40,6 +41,38 @@ namespace api_painel_producao.DTOs {
             this.CreatedAt = orderData.CreatedAt;
             this.CreatedBy = new UserDTO(orderData.CreatedBy);
             this.CreatedFor = new CustomerDTO (orderData.CreatedFor);
+        }
+
+        public static OrderDTO Create (CreateOrderViewModel orderData) {
+            if (orderData is null) return null;
+
+            return new OrderDTO { 
+                Reference = orderData.Reference,
+                Priority = orderData.Priority,
+                TotalPrice = orderData.TotalPrice,
+                FramedArtworks = orderData.FramedArtworks.Select(x => FramedArtworkDTO.Create(x)).ToList(),
+                CreatedForId = orderData.CustomerId
+            };
+        }
+
+        public static OrderDTO Create (Order orderData) {
+            if (orderData is null) return null;
+
+            return new OrderDTO {
+                Id = orderData.Id,
+                Reference = orderData.Reference,
+                Priority = orderData.Priority.ToString(),
+                TotalPrice = orderData.TotalPrice,
+
+                FramedArtworks = (from fa in orderData.FramedArtworks
+                                  select new FramedArtworkDTO(fa)).ToList(),
+
+                IsCanceled = orderData.IsCanceled,
+
+                CreatedAt = orderData.CreatedAt,
+                CreatedBy = new UserDTO(orderData.CreatedBy),
+                CreatedFor = new CustomerDTO(orderData.CreatedFor)
+            };
         }
     }
 
