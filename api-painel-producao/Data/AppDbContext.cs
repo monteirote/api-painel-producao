@@ -90,6 +90,12 @@ namespace api_painel_producao.Data {
                .WithMany(u => u.CanceledOrders)
                .HasForeignKey(o => o.CanceledById)
                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Order>()
+                .HasMany(o => o.FramedArtworks)
+                .WithOne(fa => fa.Order)
+                .HasForeignKey(fa => fa.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
