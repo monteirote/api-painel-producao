@@ -6,7 +6,7 @@ namespace api_painel_producao.Models {
         
         public int Id { get; set; }
 
-        public string Reference { get; set; }
+        public string Reference { get; set; } = string.Empty;
 
         public decimal TotalPrice { get; set; }
 
@@ -26,7 +26,7 @@ namespace api_painel_producao.Models {
 
         public DateTime? LastModifiedAt { get; set; }
         public User? LastModifiedBy { get; set; }
-        public int LastModifiedById { get; set; }
+        public int? LastModifiedById { get; set; }
 
 
         public bool IsCanceled { get; set; } = false;

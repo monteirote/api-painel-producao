@@ -39,6 +39,12 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IMaterialRepository, MaterialRepository>();
 builder.Services.AddScoped<IMaterialService, MaterialService>();
 
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services.AddScoped<IFramedArtworkRepository, FramedArtworkRepository>();
+builder.Services.AddScoped<IFramedArtworkService, FramedArtworkService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();

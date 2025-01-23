@@ -13,6 +13,12 @@ namespace api_painel_producao.Data {
         public DbSet<Material> Materials { get; set; }
         public DbSet<FramedArtwork> FramedArtworks { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            optionsBuilder
+                .UseSqlite("DataSource=app.db")
+                .LogTo(Console.WriteLine, LogLevel.Information);
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -7,6 +7,7 @@ namespace api_painel_producao.Services {
 
     public interface IOrderService { 
         Task<ServiceResponse<int>> CreateOrderAsync (string token, CreateOrderViewModel orderData);
+        Task<ServiceResponse<OrderDTO>> GetOrderByIdAsync(int id);
     }
 
     public class OrderService : IOrderService {
@@ -25,13 +26,35 @@ namespace api_painel_producao.Services {
 
             var userData = await _authService.ExtractTokenInfo(token);
 
-            OrderDTO orderToAdd = OrderDTO.Create(orderData);
+            var orderToAdd = OrderDTO.Create(orderData);
 
-            var orderCreated = await _orderRepository.CreateOrderAsync(orderToAdd, userData.Id);
+            await _orderRepository.CreateOrderAsync(orderToAdd, userData.Id);
 
-            foreach (var item in orderToAdd.FramedArtworks) { 
-             // adicionar os framed artworks
+            if (orderToAdd.Id is null)
+                return ServiceResponse<int>.Fail("Action failed: internal error.");
+
+            foreach (var item in orderToAdd.FramedArtworks) {
+                await _framedArtworkRepository.AddFramedArtworkToOrder(item, orderToAdd.Id.Value);
             };
+
+            return ServiceResponse<int>.Ok(orderToAdd.Id.Value);
+        }
+
+        public async Task<ServiceResponse<OrderDTO>> GetOrderByIdAsync (int id) {
+            try
+            {
+                var orderFound = await _orderRepository.GetOrderById(id);
+
+                if (orderFound is null)
+                    return ServiceResponse<OrderDTO>.Fail("Action failed: This order does not exist.");
+
+                return ServiceResponse<OrderDTO>.Ok(orderFound);
+
+            }
+            catch (Exception e)
+            {
+                return ServiceResponse<OrderDTO>.Fail("Action failed: internal error.");
+            }
         }
     }
 }

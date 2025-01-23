@@ -51,7 +51,7 @@ namespace api_painel_producao.Repositories{
         public async Task<List<MaterialDTO>> GetMaterialsByType (MaterialType type) {
 
             var results = await _context.Materials.Where(x => x.Type == type)
-                                                    .Select(x => new MaterialDTO(x))
+                                                    .Select(x => MaterialDTO.Create(x))
                                                     .ToListAsync();
 
             return results;

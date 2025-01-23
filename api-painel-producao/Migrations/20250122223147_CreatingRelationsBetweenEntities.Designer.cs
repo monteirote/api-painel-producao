@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api_painel_producao.Data;
 
@@ -10,9 +11,11 @@ using api_painel_producao.Data;
 namespace api_painel_producao.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250122223147_CreatingRelationsBetweenEntities")]
+    partial class CreatingRelationsBetweenEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -89,6 +92,7 @@ namespace api_painel_producao.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<byte[]>("ImageFile")
+                        .IsRequired()
                         .HasColumnType("BLOB");
 
                     b.Property<string>("ImageFilePath")
@@ -177,7 +181,7 @@ namespace api_painel_producao.Migrations
                     b.Property<DateTime?>("LastModifiedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("LastModifiedById")
+                    b.Property<int>("LastModifiedById")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Priority")
@@ -349,7 +353,8 @@ namespace api_painel_producao.Migrations
                     b.HasOne("api_painel_producao.Models.User", "LastModifiedBy")
                         .WithMany("ModifiedOrders")
                         .HasForeignKey("LastModifiedById")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
 
                     b.Navigation("CanceledBy");
 

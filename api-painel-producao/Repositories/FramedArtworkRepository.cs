@@ -6,9 +6,10 @@ using api_painel_producao.Data;
 namespace api_painel_producao.Repositories {
 
     public interface IFramedArtworkRepository {
-        Task CreateFramedArtwork (FramedArtworkDTO framedArtwork);
+        Task<int> CreateFramedArtwork (FramedArtworkDTO framedArtwork);
         Task<FramedArtworkDTO> GetFramedArtorkById (int id);
         Task DeleteFramedArtwork (int id);
+        Task AddFramedArtworkToOrder (FramedArtworkDTO framedArtwork, int orderId);
     }
 
     public class FramedArtworkRepository : IFramedArtworkRepository {
@@ -19,7 +20,7 @@ namespace api_painel_producao.Repositories {
             _context = context;
         }
 
-        public async Task CreateFramedArtwork (FramedArtworkDTO framedArtwork) {
+        public async Task<int> CreateFramedArtwork (FramedArtworkDTO framedArtwork) {
 
             var artworkModel = new FramedArtwork {
                 Height = framedArtwork.Height,
@@ -33,6 +34,8 @@ namespace api_painel_producao.Repositories {
 
             _context.FramedArtworks.Add(artworkModel);
             await _context.SaveChangesAsync();
+
+            return artworkModel.Id;
         }
 
         public async Task<FramedArtworkDTO> GetFramedArtorkById (int id) { 
@@ -47,6 +50,23 @@ namespace api_painel_producao.Repositories {
             var artworkFound = await _context.FramedArtworks.FirstOrDefaultAsync(x => x.Id == id);
 
             _context.FramedArtworks.Remove(artworkFound);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddFramedArtworkToOrder(FramedArtworkDTO framedArtworkDTO, int orderId) {
+
+            int framedArtworkId = await CreateFramedArtwork(framedArtworkDTO);
+
+            var framedArtwork = await _context.FramedArtworks.FirstOrDefaultAsync(x => x.Id == framedArtworkId);
+            var order = await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
+
+            if (order is null || framedArtwork is null) return;
+
+            framedArtwork.Order = order;
+            framedArtwork.OrderId = order.Id;
+
+            order.FramedArtworks.Add(framedArtwork);
+
             await _context.SaveChangesAsync();
         }
 

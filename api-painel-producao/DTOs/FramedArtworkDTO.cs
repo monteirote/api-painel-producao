@@ -29,10 +29,10 @@ namespace api_painel_producao.DTOs {
             this.Width = framedArtworkData.Width;
             this.TotalPrice = framedArtworkData.TotalPrice;
             this.ImageDescription = framedArtworkData.ImageDescription;
-            this.Glass = new MaterialDTO (framedArtworkData.Glass);
-            this.Frame = new MaterialDTO (framedArtworkData.Frame);
-            this.Background = new MaterialDTO (framedArtworkData.Background);
-            this.Paper = new MaterialDTO (framedArtworkData.Paper);
+            this.Glass = MaterialDTO.Create(framedArtworkData.Glass);
+            this.Frame = MaterialDTO.Create(framedArtworkData.Frame);
+            this.Background = MaterialDTO.Create(framedArtworkData.Background);
+            this.Paper = MaterialDTO.Create(framedArtworkData.Paper);
         }
 
         private FramedArtworkDTO() { }
