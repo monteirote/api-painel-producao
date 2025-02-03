@@ -25,7 +25,11 @@ builder.Services.AddAuthentication(x => {
 });
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("DataSource=app.db; Cache=Shared"));
+
+builder.Services.AddDbContext<AppDbContext>(options => 
+    options.UseMySql("",
+        new MySqlServerVersion(new Version(5, 6, 26))));
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

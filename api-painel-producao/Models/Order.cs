@@ -17,11 +17,11 @@ namespace api_painel_producao.Models {
 
         public DateTime CreatedAt { get; set; }
         public Customer? CreatedFor { get; set; }
-        public int CreatedForId { get; set; }
+        public int? CreatedForId { get; set; }
 
 
         public User CreatedBy { get; set; }
-        public int CreatedById { get; set; }
+        public int? CreatedById { get; set; }
 
 
         public DateTime? LastModifiedAt { get; set; }

@@ -26,7 +26,7 @@ namespace api_painel_producao.Models {
 
 
         [ForeignKey("CreatedBy")]
-        public int CreatedById { get; set; }
+        public int? CreatedById { get; set; }
 
         [ForeignKey("LastModifiedBy")]
         public int? LastModifiedById { get; set; }

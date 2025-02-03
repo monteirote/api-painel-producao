@@ -1,10 +1,23 @@
 ﻿using api_painel_producao.Models.Enums;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace api_painel_producao.Models {
+
     public class User {
+
+        [Key]
         public int Id { get; set; }
+
         public string Name { get; set; } = string.Empty;
+
+        [Required]
+        [Column(TypeName = "VARCHAR(255)")]
         public string Email { get; set; } = string.Empty;
+
+        [Required]
+        [Column(TypeName = "VARCHAR(255)")]
         public string Username { get; set; } = string.Empty;
 
         public UserRole Role { get; set; } = UserRole.Vendedor;

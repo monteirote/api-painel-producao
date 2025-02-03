@@ -13,11 +13,14 @@ namespace api_painel_producao.Data {
         public DbSet<Material> Materials { get; set; }
         public DbSet<FramedArtwork> FramedArtworks { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            optionsBuilder
-                .UseSqlite("DataSource=app.db")
-                .LogTo(Console.WriteLine, LogLevel.Information);
+        protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) {
+
+            //optionsBuilder.UseSqlite("Data Source=app.db");
+
+            optionsBuilder.UseMySql("",
+                            new MySqlServerVersion(new Version(5, 6, 26)));
         }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,13 +28,13 @@ namespace api_painel_producao.Data {
 
 
             // User
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Username)
-                .IsUnique();
+            //modelBuilder.Entity<User>()
+            //    .HasIndex(u => u.Username)
+            //    .IsUnique();
 
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
+            //modelBuilder.Entity<User>()
+            //    .HasIndex(u => u.Email)
+            //    .IsUnique();
 
             modelBuilder.Entity<User>()
                 .HasOne(u1 => u1.DataLastModifiedBy)
