@@ -32,10 +32,10 @@ namespace api_painel_producao.Services {
         public async Task<ServiceResponse<int>> CreateUserAsync (UserSignupViewModel userData) {
             try {
 
-                if (_repository.FindUserByEmailAsync(userData.Email) != null)
+                if (await _repository.FindUserByEmailAsync(userData.Email) != null)
                     return ServiceResponse<int>.Fail("Action failed: An account with this email already exists.");
 
-                if (_repository.FindUserByUsernameAsync(userData.Username) != null)
+                if (await _repository.FindUserByUsernameAsync(userData.Username) != null)
                     return ServiceResponse<int>.Fail("Action failed: An account with this username already exists.");
 
                 var parts = GenerateHash(userData.Password).Split(':');

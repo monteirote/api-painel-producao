@@ -49,7 +49,7 @@ namespace api_painel_producao.DTOs {
             this.Email = newCustomerData.Email;
             this.PhoneNumber = newCustomerData.PhoneNumber;
 
-            this.IsActive = false;
+            this.IsActive = true;
 
             this.CreatedAt = DateTime.Now;
         }

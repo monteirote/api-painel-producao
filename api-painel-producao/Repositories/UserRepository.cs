@@ -99,7 +99,9 @@ namespace api_painel_producao.Repositories {
         }
 
         public async Task<List<User>> RetrieveUsersPendingApproval () {
-            var usersRetrieved = await _context.Users.Where(x => x.IsActive == false && x.StatusLastModifiedAt == null).ToListAsync();
+            var usersRetrieved = await _context.Users
+                .Where(x => x.IsActive == false && x.StatusLastModifiedAt == null)
+                .ToListAsync();
 
             return usersRetrieved;
         }

@@ -269,3 +269,6 @@ __pycache__/
 # tools/
 
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore
+api-painel-producao/app.db
+api-painel-producao/app.db-shm
+api-painel-producao/app.db-wal

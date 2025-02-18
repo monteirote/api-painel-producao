@@ -37,7 +37,7 @@ namespace api_painel_producao.Repositories {
                 Email = newCostumerData.Email,
                 PhoneNumber = newCostumerData.PhoneNumber,
 
-                IsActive = false,
+                IsActive = true,
 
                 CreatedBy = user,
                 CreatedById = user.Id
