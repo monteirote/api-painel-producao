@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using api_painel_producao.Models.RequestModels.Customer;
 
 
 namespace api_painel_producao.Controllers {
@@ -50,7 +51,7 @@ namespace api_painel_producao.Controllers {
 
         [HttpPost]
         [Authorize(Roles = "Admin, Vendedor")]
-        public async Task<IActionResult> CreateCustomer ([FromBody] CreateCustomerViewModel newCustomerData) {
+        public async Task<IActionResult> CreateCustomer ([FromBody] CustomerDataRequestModel newCustomerData) {
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
@@ -65,7 +66,7 @@ namespace api_painel_producao.Controllers {
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin, Vendedor")]
-        public async Task<IActionResult> UpdateCustomer ([FromRoute] int id, [FromBody] UpdateCustomerViewModel newCustomerData) {
+        public async Task<IActionResult> UpdateCustomer ([FromRoute] int id, [FromBody] CustomerDataRequestModel newCustomerData) {
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 

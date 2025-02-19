@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using api_painel_producao.ViewModels;
 using api_painel_producao.Services;
 using api_painel_producao.Utils;
+
+using api_painel_producao.Models.RequestModels.Login;
 
 namespace api_painel_producao.Controllers {
 
@@ -20,11 +21,10 @@ namespace api_painel_producao.Controllers {
             _service = service;
         }
 
+       // Endpoints
 
-        // Endpoints
-
-        [HttpPost("signup")]
-        public async Task<IActionResult> SignUp ([FromBody] UserSignupViewModel userData) {
+       [HttpPost("signup")]
+        public async Task<IActionResult> SignUp ([FromBody] SignupRequestModel userData) {
 
             ServiceResponse<int> response = await _service.CreateUserAsync(userData);
 
@@ -36,13 +36,24 @@ namespace api_painel_producao.Controllers {
 
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login ([FromBody] UserLoginViewModel userData) {
+        public async Task<IActionResult> Login ([FromBody] LoginRequestModel userData) {
 
             ServiceResponse<string> response = await _service.LoginAsync(userData);
-            
+
             if (!response.Success)
                 return Unauthorized(response);
-            
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddHours(12)
+            };
+
+
+            Response.Cookies.Append("jwt", response.Data, cookieOptions);
+            response.Data = "";
             return Ok(response);
         }
 
@@ -78,7 +89,7 @@ namespace api_painel_producao.Controllers {
 
         [HttpPut ("{id}/change-password")]
         [Authorize (Roles = "Admin, Vendedor")]
-        public async Task<IActionResult> ChangePassword ([FromRoute] int id, [FromBody] UserChangePasswordViewModel userData) {
+        public async Task<IActionResult> ChangePassword ([FromRoute] int id, [FromBody] ChangePasswordRequestModel userData) {
 
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
@@ -95,7 +106,7 @@ namespace api_painel_producao.Controllers {
 
 
         [HttpGet("pending-approval")]
-        [Authorize (Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UsersWaitingActivation () {
             var users = await _service.RetrieveUsersPendingApproval();
 

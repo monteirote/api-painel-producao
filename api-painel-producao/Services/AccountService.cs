@@ -4,11 +4,12 @@ using api_painel_producao.ViewModels;
 using api_painel_producao.Utils;
 using api_painel_producao.Repositories;
 using api_painel_producao.Models;
+using api_painel_producao.Models.RequestModels.Login;
 
 namespace api_painel_producao.Services {
 
     public interface IAccountService {
-        Task<ServiceResponse<int>> CreateUserAsync (UserSignupViewModel user);
+        Task<ServiceResponse<int>> CreateUserAsync (SignupRequestModel user);
         Task<ServiceResponse<string>> LoginAsync (UserLoginViewModel user);
         Task<ServiceResponse<string>> DeactivateUserAsync (string token, int userId);
         Task<ServiceResponse<string>> ChangePasswordAsync (string token, int userId, string newPassword, string oldPassword = "");
@@ -29,7 +30,7 @@ namespace api_painel_producao.Services {
             _authService = authService;
         }
 
-        public async Task<ServiceResponse<int>> CreateUserAsync (UserSignupViewModel userData) {
+        public async Task<ServiceResponse<int>> CreateUserAsync (SignupRequestModel userData) {
             try {
 
                 if (await _repository.FindUserByEmailAsync(userData.Email) != null)
@@ -60,7 +61,7 @@ namespace api_painel_producao.Services {
             }
         }
 
-        public async Task<ServiceResponse<string>> LoginAsync (UserLoginViewModel userData) {
+        public async Task<ServiceResponse<string>> LoginAsync (LoginRequestModel userData) {
             try {
                 var foundUser = await _repository.FindUserByUsernameAsync(userData.Username);
 

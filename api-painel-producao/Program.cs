@@ -10,12 +10,27 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 var key = Encoding.ASCII.GetBytes(Settings.Secret);
-builder.Services.AddAuthentication(x => {
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x =>
+
+builder.Services.AddAuthentication(options =>
 {
-    x.TokenValidationParameters = new TokenValidationParameters
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var cookie = context.Request.Cookies["jwt"];  // Tenta pegar o token do cookie
+            if (!string.IsNullOrEmpty(cookie))
+            {
+                context.Token = cookie;  // Coloca o token no contexto
+            }
+            return Task.CompletedTask;
+        }
+    };
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -27,8 +42,20 @@ builder.Services.AddAuthentication(x => {
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseMySql("",
-        new MySqlServerVersion(new Version(5, 6, 26))));
+    //options.UseMySql("",
+    //    new MySqlServerVersion(new Version(5, 6, 26)))
+        options.UseSqlite("Data Source=app.db")
+    );
+
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("https://localhost:44329")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials());
+});
+
+
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -57,6 +84,8 @@ if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowSpecificOrigin");
 
 app.UseAuthentication();
 app.UseAuthorization();

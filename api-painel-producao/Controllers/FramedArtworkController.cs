@@ -5,6 +5,7 @@ using api_painel_producao.Services;
 using api_painel_producao.ViewModels;
 using api_painel_producao.Utils;
 using api_painel_producao.DTOs;
+using api_painel_producao.Models.RequestModels.FramedArtwork;
 
 namespace api_painel_producao.Controllers {
 
@@ -20,7 +21,7 @@ namespace api_painel_producao.Controllers {
 
         [HttpPost]
         [Authorize (Roles = "Admin, Vendedor")]
-        public async Task<IActionResult> CreateFramedArtwork ([FromBody] CreateFramedArtworkViewModel framedArtwork) {
+        public async Task<IActionResult> CreateFramedArtwork ([FromBody] FramedArtworkDataRequestModel framedArtwork) {
 
             ServiceResponse<int> response = await _service.CreateFramedArtwork(framedArtwork);
 

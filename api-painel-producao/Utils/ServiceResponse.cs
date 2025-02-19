@@ -13,7 +13,7 @@ namespace api_painel_producao.Utils {
 
         public bool PermissionDenied { get; private set; } = false;
 
-        public T? Data { get; private set; } = default;
+        public T? Data { get; set; } = default;
 
 
         private ServiceResponse (bool success, string message, T? data = default) {

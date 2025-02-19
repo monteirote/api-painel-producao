@@ -60,8 +60,11 @@ namespace api_painel_producao.DTOs {
             this.Email = customerData.Email;
             this.PhoneNumber = customerData.PhoneNumber;
 
-            this.Orders = (from o in customerData.Orders
-                           select new SimplifiedOrderDTO(o)).ToList();
+            
+            this.Orders = customerData.Orders.Select(x => new SimplifiedOrderDTO(x)).ToList();
+
+            //this.Orders = (from o in customerData.Orders
+            //               select new SimplifiedOrderDTO(o)).ToList();
 
             this.CreatedAt = customerData.CreatedAt;
             this.CreatedBy = customerData.CreatedBy == null ? null : new UserDTO (customerData.CreatedBy);

@@ -71,7 +71,12 @@ namespace api_painel_producao.Repositories {
         }
 
         public async Task<CustomerDTO?> GetByIdAsync (int id) {
-            Customer customerFound = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
+            Customer customerFound = await _context.Customers
+                                                    .Include(x => x.Orders)
+                                                    .Include(x => x.CreatedBy)
+                                                    .Include(x => x.LastModifiedBy)
+                                                    //.Include(x => x.DeactivatedBy)
+                                                    .FirstOrDefaultAsync(x => x.Id == id);
 
             return CustomerDTO.Create(customerFound);
         }

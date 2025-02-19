@@ -15,10 +15,10 @@ namespace api_painel_producao.Data {
 
         protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) {
 
-            //optionsBuilder.UseSqlite("Data Source=app.db");
+            optionsBuilder.UseSqlite("Data Source=app.db");
 
-            optionsBuilder.UseMySql("",
-                            new MySqlServerVersion(new Version(5, 6, 26)));
+            //optionsBuilder.UseMySql("",
+            //                new MySqlServerVersion(new Version(5, 6, 26)));
         }
 
 
