@@ -1,7 +1,10 @@
 ﻿using api_painel_producao.Models;
+using api_painel_producao.Models.DTOs;
+using api_painel_producao.Models.RequestModels.Order;
 using api_painel_producao.ViewModels;
 
-namespace api_painel_producao.DTOs {
+namespace api_painel_producao.DTOs
+{
 
     public class OrderDTO {
         public int? Id { get; set; }
@@ -25,25 +28,9 @@ namespace api_painel_producao.DTOs {
 
         public DateTime? CanceledAt { get; set; }
         public UserDTO? CanceledBy { get; set; }
-        public OrderDTO() { }
-        public OrderDTO (Order orderData) {
+       
 
-            this.Id = orderData.Id;
-            this.Reference = orderData.Reference;
-            this.Priority = orderData.Priority.ToString();
-            this.TotalPrice = orderData.TotalPrice;
-
-            this.FramedArtworks = (from fa in orderData.FramedArtworks
-                                   select new FramedArtworkDTO(fa)).ToList();
-
-            this.IsCanceled = orderData.IsCanceled;
-
-            this.CreatedAt = orderData.CreatedAt;
-            this.CreatedBy = new UserDTO(orderData.CreatedBy);
-            this.CreatedFor = new CustomerDTO (orderData.CreatedFor);
-        }
-
-        public static OrderDTO Create (CreateOrderViewModel orderData) {
+        public static OrderDTO Create (OrderDataRequestModel orderData) {
             if (orderData is null) return null;
 
             return new OrderDTO { 

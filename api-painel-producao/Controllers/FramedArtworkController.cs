@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using api_painel_producao.Services;
-using api_painel_producao.ViewModels;
 using api_painel_producao.Utils;
 using api_painel_producao.DTOs;
 using api_painel_producao.Models.RequestModels.FramedArtwork;

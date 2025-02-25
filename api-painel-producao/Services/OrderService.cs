@@ -1,4 +1,5 @@
 ﻿using api_painel_producao.DTOs;
+using api_painel_producao.Models.RequestModels.Order;
 using api_painel_producao.Repositories;
 using api_painel_producao.Utils;
 using api_painel_producao.ViewModels;
@@ -6,7 +7,7 @@ using api_painel_producao.ViewModels;
 namespace api_painel_producao.Services {
 
     public interface IOrderService { 
-        Task<ServiceResponse<int>> CreateOrderAsync (string token, CreateOrderViewModel orderData);
+        Task<ServiceResponse<int>> CreateOrderAsync (string token, OrderDataRequestModel orderData);
         Task<ServiceResponse<OrderDTO>> GetOrderByIdAsync(int id);
     }
 
@@ -22,7 +23,7 @@ namespace api_painel_producao.Services {
             _framedArtworkRepository = framedArtworkRepository;
         }
 
-        public async Task<ServiceResponse<int>> CreateOrderAsync (string token, CreateOrderViewModel orderData) { 
+        public async Task<ServiceResponse<int>> CreateOrderAsync (string token, OrderDataRequestModel orderData) { 
 
             var userData = await _authService.ExtractTokenInfo(token);
 

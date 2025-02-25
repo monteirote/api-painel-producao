@@ -47,13 +47,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseSqlite("Data Source=app.db")
     );
 
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowSpecificOrigin",
-        builder => builder.WithOrigins("https://localhost:44329")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials());
-});
+//builder.Services.AddCors(options => {
+//    options.AddPolicy("AllowSpecificOrigin",
+//        builder => builder.WithOrigins("https://localhost:44329")
+//                          .AllowAnyHeader()
+//                          .AllowAnyMethod()
+//                          .AllowCredentials());
+//});
 
 
 

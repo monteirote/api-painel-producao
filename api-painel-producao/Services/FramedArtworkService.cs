@@ -4,11 +4,12 @@ using api_painel_producao.ViewModels;
 using api_painel_producao.DTOs;
 using api_painel_producao.Models.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
+using api_painel_producao.Models.RequestModels.FramedArtwork;
 
 namespace api_painel_producao.Services {
 
     public interface IFramedArtworkService {
-        Task<ServiceResponse<int>> CreateFramedArtwork (CreateFramedArtworkViewModel framedArtwork);
+        Task<ServiceResponse<int>> CreateFramedArtwork (FramedArtworkDataRequestModel framedArtwork);
         Task<ServiceResponse<FramedArtworkDTO>> GetArtworkById (int id);
         Task<ServiceResponse<int>> DeleteArtworkById (int id);
     }
@@ -24,7 +25,7 @@ namespace api_painel_producao.Services {
             _materialRepository = materialRepository;
         }
 
-        public async Task<ServiceResponse<int>> CreateFramedArtwork (CreateFramedArtworkViewModel framedArtwork) {
+        public async Task<ServiceResponse<int>> CreateFramedArtwork (FramedArtworkDataRequestModel framedArtwork) {
             try {
 
                 if (!await ValidateMaterial(MaterialType.Glass, framedArtwork.GlassId))
@@ -44,6 +45,8 @@ namespace api_painel_producao.Services {
                 await _repository.CreateFramedArtwork(dto);
 
                 return ServiceResponse<int>.Ok(dto.Id);
+
+                return null;
 
             } catch (Exception e) {
                 return ServiceResponse<int>.Fail("Action failed: internal error.");

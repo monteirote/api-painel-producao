@@ -1,19 +1,18 @@
 ﻿using api_painel_producao.Models;
+using api_painel_producao.Models.RequestModels.Material;
 using api_painel_producao.ViewModels;
 
 namespace api_painel_producao.DTOs {
     public class MaterialDTO {
 
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Type { get; set; }
-        public string MeasurementUnit { get; set; }
-        public decimal ValueByUnit { get; set; }
+        public int Id { get; set; } 
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public string MeasurementUnit { get; set; } = string.Empty;
+        public decimal ValueByUnit { get; set; } = 0;
 
-        private MaterialDTO () { }
-
-        public static MaterialDTO Create (CreateMaterialViewModel material) {
+        public static MaterialDTO Create (MaterialDataRequestModel material) {
 
             if (material is null) return null;
 

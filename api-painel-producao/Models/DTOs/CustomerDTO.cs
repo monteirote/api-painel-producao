@@ -1,7 +1,8 @@
 ﻿using api_painel_producao.Models;
-using api_painel_producao.ViewModels;
+using api_painel_producao.Models.DTOs;
 
-namespace api_painel_producao.DTOs {
+namespace api_painel_producao.DTOs
+{
 
     public class CustomerDTO {
 
@@ -14,7 +15,7 @@ namespace api_painel_producao.DTOs {
 
         public bool IsActive { get; set; } = true;
 
-        public UserDTO? CreatedBy { get; set; }
+        public UserDTO CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
 
 

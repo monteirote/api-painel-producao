@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using api_painel_producao.Services;
 using Microsoft.AspNetCore.Authorization;
-using api_painel_producao.ViewModels;
 using api_painel_producao.Utils;
 using api_painel_producao.DTOs;
+using api_painel_producao.Models.RequestModels.Order;
 
 namespace api_painel_producao.Controllers {
 
@@ -19,7 +19,7 @@ namespace api_painel_producao.Controllers {
 
         [HttpPost]
         [Authorize(Roles = "Admin, Vendedor")]
-        public async Task<IActionResult> CreateOrder ([FromBody] CreateOrderViewModel order) {
+        public async Task<IActionResult> CreateOrder ([FromBody] OrderDataRequestModel order) {
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 

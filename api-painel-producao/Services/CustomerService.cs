@@ -5,6 +5,8 @@ using api_painel_producao.Utils;
 using api_painel_producao.Models.Enums;
 using api_painel_producao.DTOs;
 using api_painel_producao.Models.RequestModels.Customer;
+using api_painel_producao.Models.DTOs;
+using api_painel_producao.Models.ResponseModels.Customer;
 
 namespace api_painel_producao.Services {
 
@@ -31,11 +33,13 @@ namespace api_painel_producao.Services {
 
                 var userData = await _authService.ExtractTokenInfo(token);
 
-                var customerToAdd = CustomerDTO.Create(newCustomerData);
+                //var customerToAdd = CustomerDTO.Create(newCustomerData);
 
-                await _repository.CreateAsync(customerToAdd, userData.Id);
+                //await _repository.CreateAsync(customerToAdd, userData.Id);
 
-                return ServiceResponse<int>.Ok(customerToAdd.Id, "Customer created successfully.");
+                //return ServiceResponse<int>.Ok(customerToAdd.Id, "Customer created successfully.");
+
+                return null;
 
 
             } catch (Exception e) {
@@ -43,15 +47,17 @@ namespace api_painel_producao.Services {
             }
         }
 
-        public async Task<ServiceResponse<List<CustomerDTO>>> FindAllCustomersAsync () { 
+        public async Task<ServiceResponse<List<CustomerResponseModel>>> FindAllCustomersAsync () { 
             try {
 
-                var allCustomers = await _repository.FindAllCustomersAsync();
+                List<CustomerDTO> customers = await _repository.FindAllCustomersAsync();
 
-                return ServiceResponse<List<CustomerDTO>>.Ok(allCustomers);
+                var response = customers.Select(x => CustomerResponseModel.Create(x)).ToList();
+
+                return ServiceResponse<List<CustomerResponseModel>>.Ok(response);
 
             } catch (Exception e) {
-                return ServiceResponse<List<CustomerDTO>>.Fail("Action failed: internal error.");
+                return ServiceResponse<List<CustomerResponseModel>>.Fail("Action failed: internal error.");
             }
         }
 
@@ -84,11 +90,13 @@ namespace api_painel_producao.Services {
                 if (customerFound is null)
                     return ServiceResponse<CustomerDTO>.Fail("Action failed: This customer does not exist.");
 
-                var customerDTO = CustomerDTO.Create(customerData);
+                //var customerDTO = CustomerDTO.Create(customerData);
 
-                await _repository.UpdateCustomer(customerDTO, tokenData.Id);
+                //await _repository.UpdateCustomer(customerDTO, tokenData.Id);
 
-                return ServiceResponse<CustomerDTO>.Ok();
+                //return ServiceResponse<CustomerDTO>.Ok();
+
+                return null;
             } catch (Exception e) {
                 return ServiceResponse<CustomerDTO>.Fail("Action failed: internal error.");
             }

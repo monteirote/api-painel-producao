@@ -1,4 +1,5 @@
 ﻿using api_painel_producao.Models;
+using api_painel_producao.Models.RequestModels.FramedArtwork;
 using api_painel_producao.ViewModels;
 
 namespace api_painel_producao.DTOs {
@@ -22,22 +23,10 @@ namespace api_painel_producao.DTOs {
         public int BackgroundId { get; set; }
         public int PaperId { get; set; }
 
+        public static FramedArtworkDTO Create (FramedArtworkDataRequestModel framedArtwork) {
 
-        public FramedArtworkDTO (FramedArtwork framedArtworkData) {
-            this.Id = framedArtworkData.Id;
-            this.Height = framedArtworkData.Height;
-            this.Width = framedArtworkData.Width;
-            this.TotalPrice = framedArtworkData.TotalPrice;
-            this.ImageDescription = framedArtworkData.ImageDescription;
-            this.Glass = MaterialDTO.Create(framedArtworkData.Glass);
-            this.Frame = MaterialDTO.Create(framedArtworkData.Frame);
-            this.Background = MaterialDTO.Create(framedArtworkData.Background);
-            this.Paper = MaterialDTO.Create(framedArtworkData.Paper);
-        }
-
-        private FramedArtworkDTO() { }
-
-        public static FramedArtworkDTO Create (CreateFramedArtworkViewModel framedArtwork) {
+            if (framedArtwork is null)
+                return null;
 
             return new FramedArtworkDTO {
                 Height = framedArtwork.Height,
@@ -49,8 +38,22 @@ namespace api_painel_producao.DTOs {
             };
         }
 
-        public static FramedArtworkDTO Create (FramedArtwork framedArtworkData) {
-            return framedArtworkData is null ? null : new FramedArtworkDTO (framedArtworkData);
+        public static FramedArtworkDTO Create(FramedArtwork framedArtwork) {
+
+            if (framedArtwork is null)
+                return null;
+            
+            return new FramedArtworkDTO {
+                Id = framedArtwork.Id,
+                Height = framedArtwork.Height,
+                Width = framedArtwork.Width,
+                TotalPrice = framedArtwork.TotalPrice,
+                ImageDescription = framedArtwork.ImageDescription,
+                Glass = MaterialDTO.Create (framedArtwork.Glass),
+                Frame = MaterialDTO.Create (framedArtwork.Frame),
+                Background = MaterialDTO.Create (framedArtwork.Background),
+                Paper = MaterialDTO.Create (framedArtwork.Paper)
+            };
         }
     }
 

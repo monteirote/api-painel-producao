@@ -1,13 +1,13 @@
 ﻿using api_painel_producao.DTOs;
 using api_painel_producao.Repositories;
 using api_painel_producao.Utils;
-using api_painel_producao.ViewModels;
 using api_painel_producao.Models.Enums;
+using api_painel_producao.Models.RequestModels.Material;
 
 namespace api_painel_producao.Services {
 
     public interface IMaterialService {
-        Task<ServiceResponse<int>> CreateMaterialAsync (CreateMaterialViewModel material);
+        Task<ServiceResponse<int>> CreateMaterialAsync (MaterialDataRequestModel material);
         Task<ServiceResponse<MaterialDTO>> GetMaterialByIdAsync (int id);
         Task<ServiceResponse<List<MaterialDTO>>> GetMaterialsByType (string type);
         Task<ServiceResponse<int>> DeleteMaterialById (int id);
@@ -21,7 +21,7 @@ namespace api_painel_producao.Services {
             _repository = repository;
         }
 
-        public async Task<ServiceResponse<int>> CreateMaterialAsync (CreateMaterialViewModel material) {
+        public async Task<ServiceResponse<int>> CreateMaterialAsync (MaterialDataRequestModel material) {
             try {
                 var materialToAdd = MaterialDTO.Create(material);
 

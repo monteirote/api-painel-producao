@@ -5,16 +5,17 @@ using api_painel_producao.Utils;
 using api_painel_producao.Repositories;
 using api_painel_producao.Models;
 using api_painel_producao.Models.RequestModels.Login;
+using api_painel_producao.Models.ResponseModels.Login;
 
 namespace api_painel_producao.Services {
 
     public interface IAccountService {
-        Task<ServiceResponse<int>> CreateUserAsync (SignupRequestModel user);
-        Task<ServiceResponse<string>> LoginAsync (UserLoginViewModel user);
+        Task<ServiceResponse<int>> CreateUserAsync (SignupRequestModel userData);
+        Task<ServiceResponse<string>> LoginAsync (LoginRequestModel user);
         Task<ServiceResponse<string>> DeactivateUserAsync (string token, int userId);
         Task<ServiceResponse<string>> ChangePasswordAsync (string token, int userId, string newPassword, string oldPassword = "");
         Task<ServiceResponse<string>> ActivateUserAsync (string token, int userId);
-        Task<ServiceResponse<List<PendingApprovalUserViewModel>>> RetrieveUsersPendingApproval ();
+        Task<ServiceResponse<List<UserPendingApprovalResponseModel>>> RetrieveUsersPendingApproval ();
     }
 
 
@@ -22,8 +23,6 @@ namespace api_painel_producao.Services {
 
         private readonly IUserRepository _repository;
         private readonly IAuthService _authService;
-
-
 
         public AccountService (IUserRepository repository, IAuthService authService) {
             _repository = repository;
@@ -110,8 +109,11 @@ namespace api_painel_producao.Services {
             if (tokenUser is null)
                 return ServiceResponse<string>.Fail("Action failed: This token is not valid.");
 
-
             var userToChangePassword = await _repository.FindUserByIdAsync(userId);
+
+            if (userToChangePassword is null)
+                return ServiceResponse<string>.Fail("Action failed: This user does not exist.");
+
 
             if (tokenUser.Role.ToString() != "Admin" && userToChangePassword.Id != tokenUser.Id)
                 return ServiceResponse<string>.DenyPermission();
@@ -124,7 +126,7 @@ namespace api_painel_producao.Services {
 
             await _repository.UpdatePassword(userId, passwordData, tokenUser.Id);
 
-            return ServiceResponse<string>.Ok(null, "Password has been successfully updated.");
+            return ServiceResponse<string>.Ok("Password has been successfully updated.");
         }
 
         public async Task<ServiceResponse<string>> ActivateUserAsync (string token, int userId) {
@@ -144,21 +146,13 @@ namespace api_painel_producao.Services {
             return ServiceResponse<string>.Ok("User has been successfully activated.");
         }
 
-        public async Task<ServiceResponse<List<PendingApprovalUserViewModel>>> RetrieveUsersPendingApproval () {
+        public async Task<ServiceResponse<List<UserPendingApprovalResponseModel>>> RetrieveUsersPendingApproval () {
 
             var usersRetrieved = await _repository.RetrieveUsersPendingApproval();
 
-            var results = usersRetrieved.Select(x => {
-                return new PendingApprovalUserViewModel {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Email = x.Email,
-                    Username = x.Username,
-                    CreatedAt = x.CreatedAt
-                };
-            }).ToList();
+            var results = usersRetrieved.Select(x => UserPendingApprovalResponseModel.Create(x)).ToList();
 
-            return ServiceResponse<List<PendingApprovalUserViewModel>>.Ok(results);
+            return ServiceResponse<List<UserPendingApprovalResponseModel>>.Ok(results);
         }
 
 

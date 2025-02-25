@@ -62,7 +62,7 @@ namespace api_painel_producao.Controllers {
         [Authorize (Roles = "Admin, Vendedor")]
         public async Task<IActionResult> DeactivateAccount ([FromRoute] int id) { 
 
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
             ServiceResponse<string> response = await _service.DeactivateUserAsync(token, id);
 

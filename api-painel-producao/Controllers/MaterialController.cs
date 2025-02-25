@@ -1,7 +1,7 @@
 ﻿using api_painel_producao.DTOs;
+using api_painel_producao.Models.RequestModels.Material;
 using api_painel_producao.Services;
 using api_painel_producao.Utils;
-using api_painel_producao.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +20,7 @@ namespace api_painel_producao.Controllers {
 
         [HttpPost]
         [Authorize (Roles = "Admin, Vendedor")]
-        public async Task<ActionResult> CreateMaterial ([FromBody] CreateMaterialViewModel material) {
+        public async Task<ActionResult> CreateMaterial ([FromBody] MaterialDataRequestModel material) {
 
             ServiceResponse<int> response = await _service.CreateMaterialAsync(material);
 

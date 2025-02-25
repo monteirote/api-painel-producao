@@ -1,8 +1,8 @@
-﻿using api_painel_producao.Models;
+﻿namespace api_painel_producao.Models.DTOs
+{
 
-namespace api_painel_producao.DTOs {
-
-    public class UserDTO {
+    public class UserDTO
+    {
         public int Id { get; set; }
 
         public string Name { get; set; }
@@ -15,31 +15,31 @@ namespace api_painel_producao.DTOs {
 
         public DateTime CreatedAt { get; set; }
 
-
-        public UserDTO (User userData) {
-
-            this.Id = userData.Id;
-
-            this.Name = userData.Name;
-            this.Email = userData.Email;
-            this.Username = userData.Username;
-            this.Role = userData.Role.ToString();
-
-            this.IsActive = userData.IsActive;
-            this.CreatedAt = userData.CreatedAt;
+        public static UserDTO Create (User userData) {
+            return new UserDTO {
+                Id = userData.Id,
+                Name = userData.Name,
+                Email = userData.Email,
+                Username = userData.Username,
+                Role = userData.Role.ToString(),
+                IsActive = userData.IsActive,
+                CreatedAt = userData.CreatedAt,
+            };
         }
     }
 
-    public class SimplifiedUserDTO {
+    public class SimplifiedUserDTO
+    {
 
         public int Id { get; set; }
         public string Name { get; set; }
         public string Role { get; set; }
 
-        public SimplifiedUserDTO (User userData) {
-            this.Id = userData.Id;
-            this.Name = userData.Name;
-            this.Role = userData.Role.ToString();
+        public SimplifiedUserDTO(User userData)
+        {
+            Id = userData.Id;
+            Name = userData.Name;
+            Role = userData.Role.ToString();
         }
     }
 }

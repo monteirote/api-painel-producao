@@ -1,8 +1,11 @@
 ﻿using api_painel_producao.Data;
 using api_painel_producao.Models;
+using api_painel_producao.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
-namespace api_painel_producao.Repositories {
+namespace api_painel_producao.Repositories
+{
 
     public interface IUserRepository {
         Task CreateAsync (User user);
@@ -15,7 +18,7 @@ namespace api_painel_producao.Repositories {
         Task<User?> FindUserByIdAsync (int id);
         Task<User?> FindUserByUsernameAsync (string username);
         Task<User?> FindUserByEmailAsync (string email);
-        Task<List<User>> RetrieveUsersPendingApproval ();
+        Task<List<UserDTO>> RetrieveUsersPendingApproval ();
     }
 
     public class UserRepository : IUserRepository {
@@ -98,12 +101,13 @@ namespace api_painel_producao.Repositories {
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<User>> RetrieveUsersPendingApproval () {
+        public async Task<List<UserDTO>> RetrieveUsersPendingApproval () {
+
             var usersRetrieved = await _context.Users
                 .Where(x => x.IsActive == false && x.StatusLastModifiedAt == null)
                 .ToListAsync();
 
-            return usersRetrieved;
+            return usersRetrieved.Select(x => UserDTO.Create(x)).ToList();;
         }
 
     }

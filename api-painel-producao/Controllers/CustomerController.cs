@@ -1,5 +1,4 @@
 ﻿using api_painel_producao.Services;
-using api_painel_producao.ViewModels;
 using api_painel_producao.DTOs;
 using api_painel_producao.Models;
 using api_painel_producao.Utils;
@@ -70,7 +69,7 @@ namespace api_painel_producao.Controllers {
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
-            ServiceResponse<Customer> response = await _service.UpdateCustomerById(id, token, newCustomerData);
+            ServiceResponse<CustomerDTO> response = await _service.UpdateCustomerById(id, newCustomerData, token);
 
             if (response.PermissionDenied)
                 return Forbid(response.Message);
