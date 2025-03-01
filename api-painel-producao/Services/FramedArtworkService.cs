@@ -5,12 +5,13 @@ using api_painel_producao.DTOs;
 using api_painel_producao.Models.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using api_painel_producao.Models.RequestModels.FramedArtwork;
+using api_painel_producao.Models.ResponseModels.FramedArtwork;
 
 namespace api_painel_producao.Services {
 
     public interface IFramedArtworkService {
         Task<ServiceResponse<int>> CreateFramedArtwork (FramedArtworkDataRequestModel framedArtwork);
-        Task<ServiceResponse<FramedArtworkDTO>> GetArtworkById (int id);
+        Task<ServiceResponse<FramedArtworkResponseModel>> GetArtworkById (int id);
         Task<ServiceResponse<int>> DeleteArtworkById (int id);
     }
 
@@ -53,18 +54,20 @@ namespace api_painel_producao.Services {
             }
         }
 
-        public async Task<ServiceResponse<FramedArtworkDTO>> GetArtworkById (int id) {
+        public async Task<ServiceResponse<FramedArtworkResponseModel>> GetArtworkById (int id) {
             try {
 
                 var artworkFound = await _repository.GetFramedArtorkById(id);
 
                 if (artworkFound is null)
-                    return ServiceResponse<FramedArtworkDTO>.Fail("Action failed: this artwork does not exist");
+                    return ServiceResponse<FramedArtworkResponseModel>.Fail("Action failed: this artwork does not exist");
 
-                return ServiceResponse<FramedArtworkDTO>.Ok(artworkFound);
+                var result = FramedArtworkResponseModel.Create(artworkFound);
+
+                return ServiceResponse<FramedArtworkResponseModel>.Ok(result);
 
             } catch (Exception e) {
-                return ServiceResponse<FramedArtworkDTO>.Fail("Action failed: internal error.");
+                return ServiceResponse<FramedArtworkResponseModel>.Fail("Action failed: internal error.");
             }
         }
 

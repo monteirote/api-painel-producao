@@ -25,6 +25,10 @@ namespace api_painel_producao.Models.RequestModels.Order {
 
 
         [Required]
+        public DateTime ExpectedDeliveryDate { get; set; }
+
+
+        [Required]
         public List<FramedArtworkDataRequestModel> FramedArtworks { get; set; } = [];
 
     }

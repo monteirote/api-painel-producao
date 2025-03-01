@@ -60,9 +60,9 @@ namespace api_painel_producao.Controllers {
 
         [HttpPut ("{id}/deactivate")]
         [Authorize (Roles = "Admin, Vendedor")]
-        public async Task<IActionResult> DeactivateAccount ([FromRoute] int id) { 
+        public async Task<IActionResult> DeactivateAccount ([FromRoute] int id) {
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+            var token = Request.Cookies["jwt"];
 
             ServiceResponse<string> response = await _service.DeactivateUserAsync(token, id);
 
@@ -76,7 +76,7 @@ namespace api_painel_producao.Controllers {
         [HttpPut ("{id}/activate")]
         [Authorize (Roles = "Admin")]
         public async Task<IActionResult> ActivateAccount ([FromRoute] int id) {
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var token = Request.Cookies["jwt"];
 
             ServiceResponse<string> response = await _service.ActivateUserAsync(token, id);
 
@@ -91,7 +91,7 @@ namespace api_painel_producao.Controllers {
         [Authorize (Roles = "Admin, Vendedor")]
         public async Task<IActionResult> ChangePassword ([FromRoute] int id, [FromBody] ChangePasswordRequestModel userData) {
 
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var token = Request.Cookies["jwt"];
 
             ServiceResponse<string> response = await _service.ChangePasswordAsync(token, id, userData.NewPassword, userData.OldPassword);
 

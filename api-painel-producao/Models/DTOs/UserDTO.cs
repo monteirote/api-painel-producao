@@ -16,6 +16,8 @@
         public DateTime CreatedAt { get; set; }
 
         public static UserDTO Create (User userData) {
+            if (userData is null) return null;
+
             return new UserDTO {
                 Id = userData.Id,
                 Name = userData.Name,

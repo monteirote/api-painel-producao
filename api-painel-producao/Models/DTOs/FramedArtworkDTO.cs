@@ -11,6 +11,8 @@ namespace api_painel_producao.DTOs {
 
         public decimal TotalPrice { get; set; }
 
+        public int? OrderId { get; set; }
+
         public string ImageDescription { get; set; }
 
         public MaterialDTO Glass { get; set; }
@@ -48,6 +50,7 @@ namespace api_painel_producao.DTOs {
                 Height = framedArtwork.Height,
                 Width = framedArtwork.Width,
                 TotalPrice = framedArtwork.TotalPrice,
+                OrderId = framedArtwork.OrderId,
                 ImageDescription = framedArtwork.ImageDescription,
                 Glass = MaterialDTO.Create (framedArtwork.Glass),
                 Frame = MaterialDTO.Create (framedArtwork.Frame),

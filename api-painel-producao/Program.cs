@@ -41,21 +41,16 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<AppDbContext>(options => 
-    //options.UseMySql("",
-    //    new MySqlServerVersion(new Version(5, 6, 26)))
+builder.Services.AddDbContext<AppDbContext>(options =>
+        //options.UseMySql("",
+        //    new MySqlServerVersion(new Version(5, 6, 26)))
         options.UseSqlite("Data Source=app.db")
     );
 
-//builder.Services.AddCors(options => {
-//    options.AddPolicy("AllowSpecificOrigin",
-//        builder => builder.WithOrigins("https://localhost:44329")
-//                          .AllowAnyHeader()
-//                          .AllowAnyMethod()
-//                          .AllowCredentials());
-//});
 
-
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowSpecificOrigin", builder => builder.AllowAnyOrigin());
+});
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -80,16 +75,21 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment()) {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseCors("AllowSpecificOrigin");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.Use(async (context, next) => {
+    if (context.Request.Path == "/") {
+        context.Response.Redirect("/swagger");
+        return;
+    }
+    await next();
+});
 
 app.Run();

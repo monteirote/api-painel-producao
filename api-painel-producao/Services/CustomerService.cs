@@ -11,36 +11,37 @@ using api_painel_producao.Models.ResponseModels.Customer;
 namespace api_painel_producao.Services {
 
     public interface ICustomerService {
-        Task<ServiceResponse<int>> CreateCustomerAsync (string token, CustomerDataRequestModel newCustomer);
-        Task<ServiceResponse<CustomerDTO>> GetCustomerById (int id);
+        Task<ServiceResponse<int>> CreateCustomerAsync (string token, CustomerDataRequestModel newCustomerData);
+        Task<ServiceResponse<DetailedCustomerResponseModel>> GetCustomerById(int id);
+
+
+
+
         Task<ServiceResponse<CustomerDTO>> UpdateCustomerById (int customerId, CustomerDataRequestModel customerData, string token);
         Task<ServiceResponse<int>> DeleteCustomer (int id, string token);
-        Task<ServiceResponse<List<CustomerDTO>>> FindAllCustomersAsync ();
+        Task<ServiceResponse<List<CustomerResponseModel>>> FindAllCustomersAsync ();
     }
 
     public class CustomerService : ICustomerService {
 
         private readonly ICustomerRepository _repository;
         private readonly IAuthService _authService;
-
         public CustomerService (ICustomerRepository repository, IAuthService authService) {
             _repository = repository;
             _authService = authService;
         }
 
-        public async Task<ServiceResponse<int>> CreateCustomerAsync (string token, CustomerDataRequestModel newCustomerData) {
+
+        public async Task<ServiceResponse<int>> CreateCustomerAsync(string token, CustomerDataRequestModel newCustomerData) {
             try {
 
                 var userData = await _authService.ExtractTokenInfo(token);
 
-                //var customerToAdd = CustomerDTO.Create(newCustomerData);
+                var customerToAdd = CustomerDTO.Create(newCustomerData);
 
-                //await _repository.CreateAsync(customerToAdd, userData.Id);
+                await _repository.CreateAsync(customerToAdd, userData.Id);
 
-                //return ServiceResponse<int>.Ok(customerToAdd.Id, "Customer created successfully.");
-
-                return null;
-
+                return ServiceResponse<int>.Ok(customerToAdd.Id, "Customer created successfully.");
 
             } catch (Exception e) {
                 return ServiceResponse<int>.Fail("Failed to create customer.");
@@ -61,18 +62,22 @@ namespace api_painel_producao.Services {
             }
         }
 
-        public async Task<ServiceResponse<CustomerDTO>> GetCustomerById (int id) { 
+        
+        
+        public async Task<ServiceResponse<DetailedCustomerResponseModel>> GetCustomerById (int id) { 
             try {
 
                 var customerFound = await _repository.GetByIdAsync(id);
 
                 if (customerFound is null)
-                    return ServiceResponse<CustomerDTO>.Fail("Action failed: This customer does not exist.");
+                    return ServiceResponse<DetailedCustomerResponseModel>.Fail("Action failed: This customer does not exist.");
 
-                return ServiceResponse<CustomerDTO>.Ok(customerFound);
+                var result = DetailedCustomerResponseModel.Create(customerFound);
+
+                return ServiceResponse<DetailedCustomerResponseModel>.Ok(result);
 
             } catch (Exception e) {
-                return ServiceResponse<CustomerDTO>.Fail("Action failed: internal error.");
+                return ServiceResponse<DetailedCustomerResponseModel>.Fail("Action failed: internal error.");
             }
         }
 
@@ -92,9 +97,9 @@ namespace api_painel_producao.Services {
 
                 //var customerDTO = CustomerDTO.Create(customerData);
 
-                //await _repository.UpdateCustomer(customerDTO, tokenData.Id);
+                await _repository.UpdateCustomer(customerFound, tokenData.Id);
 
-                //return ServiceResponse<CustomerDTO>.Ok();
+                return ServiceResponse<CustomerDTO>.Ok();
 
                 return null;
             } catch (Exception e) {

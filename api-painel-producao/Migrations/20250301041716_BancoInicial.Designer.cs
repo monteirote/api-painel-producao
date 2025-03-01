@@ -11,8 +11,8 @@ using api_painel_producao.Data;
 namespace api_painel_producao.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250203005802_CreatingNewDatabase")]
-    partial class CreatingNewDatabase
+    [Migration("20250301041716_BancoInicial")]
+    partial class BancoInicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -175,6 +175,9 @@ namespace api_painel_producao.Migrations
 
                     b.Property<int?>("CreatedForId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpectedDeliveryDate")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsCanceled")
                         .HasColumnType("tinyint(1)");

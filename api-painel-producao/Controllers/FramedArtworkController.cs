@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using api_painel_producao.Services;
 using api_painel_producao.Utils;
-using api_painel_producao.DTOs;
 using api_painel_producao.Models.RequestModels.FramedArtwork;
+using api_painel_producao.Models.ResponseModels.FramedArtwork;
 
 namespace api_painel_producao.Controllers {
 
@@ -35,7 +35,7 @@ namespace api_painel_producao.Controllers {
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> GetArtworkById ([FromRoute] int id) { 
 
-            ServiceResponse<FramedArtworkDTO> response = await _service.GetArtworkById(id);
+            ServiceResponse<FramedArtworkResponseModel> response = await _service.GetArtworkById(id);
 
             if (!response.Success)
                 return NotFound(response);

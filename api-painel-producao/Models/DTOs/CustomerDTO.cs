@@ -1,5 +1,6 @@
 ﻿using api_painel_producao.Models;
 using api_painel_producao.Models.DTOs;
+using api_painel_producao.Models.RequestModels.Customer;
 
 namespace api_painel_producao.DTOs
 {
@@ -8,14 +9,14 @@ namespace api_painel_producao.DTOs
 
         public int Id { get; set; }
 
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
-        public List<SimplifiedOrderDTO> Orders { get; set; } = [];
+        public string Name { get; set; } = string.Empty;
+        public string? Email { get; set; }
+        public string PhoneNumber { get; set; } = string.Empty;
+        public List<OrderDTO> Orders { get; set; } = [];
 
         public bool IsActive { get; set; } = true;
 
-        public UserDTO CreatedBy { get; set; }
+        public UserDTO? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
 
 
@@ -27,68 +28,36 @@ namespace api_painel_producao.DTOs
         public DateTime? LastModifiedAt { get; set; }
 
 
-        public static CustomerDTO? Create (Customer customerData) {
-            return customerData is null ? null : new CustomerDTO (customerData);    
+        public static CustomerDTO Create (CustomerDataRequestModel customerData) {
+            if (customerData is null) return null;
+
+            return new CustomerDTO {
+                Name = customerData.Name,
+                Email = customerData.Email,
+                PhoneNumber = customerData.PhoneNumber
+            };
         }
 
-        public static CustomerDTO Create (CreateCustomerViewModel newCostumerData) {
-            return new CustomerDTO(newCostumerData);
-        }
+        public static CustomerDTO Create (Customer customerData) {
+            if (customerData is null) return null;
 
-        public static CustomerDTO Create (UpdateCustomerViewModel customerData) {
-            return new CustomerDTO(customerData);
-        }
+            return new CustomerDTO {
+                Id = customerData.Id,
+                Name = customerData.Name,
+                Email = customerData.Email,
+                PhoneNumber = customerData.PhoneNumber,
 
-        private CustomerDTO (UpdateCustomerViewModel customerData) { 
-            this.Name = customerData.Name;
-            this.Email = customerData.Email;
-            this.PhoneNumber = customerData.PhoneNumber;
-        }
+                Orders = customerData.Orders.Select(x => OrderDTO.Create(x)).ToList(),
 
-        private CustomerDTO (CreateCustomerViewModel newCustomerData) {
-            this.Name = newCustomerData.Name;
-            this.Email = newCustomerData.Email;
-            this.PhoneNumber = newCustomerData.PhoneNumber;
+                CreatedAt = customerData.CreatedAt,
+                CreatedBy = UserDTO.Create(customerData.CreatedBy),
 
-            this.IsActive = true;
+                DeactivatedAt = customerData.DeactivatedAt,
+                DeactivatedBy = UserDTO.Create(customerData.DeactivatedBy),
 
-            this.CreatedAt = DateTime.Now;
-        }
-        
-        public CustomerDTO (Customer customerData) {
-
-            this.Id = customerData.Id;
-            this.Email = customerData.Email;
-            this.PhoneNumber = customerData.PhoneNumber;
-
-            
-            this.Orders = customerData.Orders.Select(x => new SimplifiedOrderDTO(x)).ToList();
-
-            //this.Orders = (from o in customerData.Orders
-            //               select new SimplifiedOrderDTO(o)).ToList();
-
-            this.CreatedAt = customerData.CreatedAt;
-            this.CreatedBy = customerData.CreatedBy == null ? null : new UserDTO (customerData.CreatedBy);
-
-            this.DeactivatedAt = customerData.DeactivatedAt;
-            this.DeactivatedBy = customerData.DeactivatedBy == null ? null : new UserDTO(customerData.DeactivatedBy);
-
-            this.LastModifiedAt = customerData.LastModifiedAt;
-            this.LastModifiedBy = customerData.LastModifiedBy == null ? null : new UserDTO(customerData.LastModifiedBy);
-        }
-    }
-
-    public class SimplifiedCustomerDTO {
-
-        public int Id { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
-
-
-        public SimplifiedCustomerDTO (Customer customerData) {
-            this.Id = customerData.Id;
-            this.Email = customerData.Email;
-            this.PhoneNumber = customerData.PhoneNumber;
-        }
+                LastModifiedAt = customerData.LastModifiedAt,
+                LastModifiedBy = UserDTO.Create(customerData.LastModifiedBy),
+            };
+        }     
     }
 }

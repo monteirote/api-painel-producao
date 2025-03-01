@@ -65,7 +65,7 @@ namespace api_painel_producao.Repositories {
 
             List<CustomerDTO> customers = (from c in customersFound 
                                            where c.IsActive == true
-                                           select new CustomerDTO(c)).ToList();
+                                           select CustomerDTO.Create(c)).ToList();
 
             return customers;
         }
@@ -75,7 +75,7 @@ namespace api_painel_producao.Repositories {
                                                     .Include(x => x.Orders)
                                                     .Include(x => x.CreatedBy)
                                                     .Include(x => x.LastModifiedBy)
-                                                    //.Include(x => x.DeactivatedBy)
+                                                    .Include(x => x.DeactivatedBy)
                                                     .FirstOrDefaultAsync(x => x.Id == id);
 
             return CustomerDTO.Create(customerFound);

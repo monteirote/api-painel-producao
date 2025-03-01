@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api_painel_producao.Models.RequestModels.Customer;
+using api_painel_producao.Models.ResponseModels.Customer;
 
 
 namespace api_painel_producao.Controllers {
@@ -28,7 +29,7 @@ namespace api_painel_producao.Controllers {
         [Authorize (Roles = "Admin, Vendedor")]
         public async Task<IActionResult> GetAllCustomersAsync () {
 
-            ServiceResponse<List<CustomerDTO>> foundCustomers = await _service.FindAllCustomersAsync();
+            ServiceResponse<List<CustomerResponseModel>> foundCustomers = await _service.FindAllCustomersAsync();
 
             return Ok(foundCustomers);
         }
@@ -39,7 +40,7 @@ namespace api_painel_producao.Controllers {
         [Authorize (Roles = "Admin, Vendedor")]
         public async Task<IActionResult> GetCustomerById ([FromRoute] int id) {
 
-            ServiceResponse<CustomerDTO> response = await _service.GetCustomerById(id);
+            ServiceResponse<DetailedCustomerResponseModel> response = await _service.GetCustomerById(id);
 
             if (!response.Success)
                 return NotFound(response);
@@ -52,7 +53,7 @@ namespace api_painel_producao.Controllers {
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> CreateCustomer ([FromBody] CustomerDataRequestModel newCustomerData) {
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+            var token = Request.Cookies["jwt"];
 
             ServiceResponse<int> response = await _service.CreateCustomerAsync(token, newCustomerData);
 
@@ -63,11 +64,12 @@ namespace api_painel_producao.Controllers {
         }
 
 
+        // TO-DO ARRUMAR
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> UpdateCustomer ([FromRoute] int id, [FromBody] CustomerDataRequestModel newCustomerData) {
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+            var token = Request.Cookies["jwt"];
 
             ServiceResponse<CustomerDTO> response = await _service.UpdateCustomerById(id, newCustomerData, token);
 
@@ -83,9 +85,9 @@ namespace api_painel_producao.Controllers {
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin, Vendedor")]
-        public async Task<IActionResult> DeleteCustomer ([FromRoute] int id) { 
-        
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+        public async Task<IActionResult> DeleteCustomer ([FromRoute] int id) {
+
+            var token = Request.Cookies["jwt"];
 
             ServiceResponse<int> response = await _service.DeleteCustomer(id, token);
 

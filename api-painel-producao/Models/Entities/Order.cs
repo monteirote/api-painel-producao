@@ -3,7 +3,7 @@ using api_painel_producao.Models;
 
 namespace api_painel_producao.Models {
     public class Order {
-        
+
         public int Id { get; set; }
 
         public string Reference { get; set; } = string.Empty;
@@ -28,6 +28,7 @@ namespace api_painel_producao.Models {
         public User? LastModifiedBy { get; set; }
         public int? LastModifiedById { get; set; }
 
+        public DateTime ExpectedDeliveryDate {  get; set; }
 
         public bool IsCanceled { get; set; } = false;
         public DateTime? CanceledAt { get; set; }

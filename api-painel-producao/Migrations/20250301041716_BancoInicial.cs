@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace api_painel_producao.Migrations
 {
     /// <inheritdoc />
-    public partial class CreatingNewDatabase : Migration
+    public partial class BancoInicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -136,6 +136,7 @@ namespace api_painel_producao.Migrations
                     CreatedById = table.Column<int>(type: "int", nullable: true),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     LastModifiedById = table.Column<int>(type: "int", nullable: true),
+                    ExpectedDeliveryDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsCanceled = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CanceledAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CanceledById = table.Column<int>(type: "int", nullable: true)

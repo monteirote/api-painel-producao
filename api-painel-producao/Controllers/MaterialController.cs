@@ -1,5 +1,5 @@
-﻿using api_painel_producao.DTOs;
-using api_painel_producao.Models.RequestModels.Material;
+﻿using api_painel_producao.Models.RequestModels.Material;
+using api_painel_producao.Models.ResponseModels.Material;
 using api_painel_producao.Services;
 using api_painel_producao.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -35,7 +35,7 @@ namespace api_painel_producao.Controllers {
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> GetMaterialById ([FromRoute] int id) {
 
-            ServiceResponse<MaterialDTO> response = await _service.GetMaterialByIdAsync(id);
+            ServiceResponse<DetailedMaterialResponseModel> response = await _service.GetMaterialByIdAsync(id);
 
             if (!response.Success)
                 NotFound();
@@ -48,7 +48,7 @@ namespace api_painel_producao.Controllers {
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> GetMaterialsByType ([FromQuery] string type) {
 
-            ServiceResponse<List<MaterialDTO>> response = await _service.GetMaterialsByType(type);
+            ServiceResponse<List<DetailedMaterialResponseModel>> response = await _service.GetMaterialsByType(type);
 
             if (!response.Success)
                 return BadRequest(response);

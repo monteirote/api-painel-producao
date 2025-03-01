@@ -3,13 +3,14 @@ using api_painel_producao.Repositories;
 using api_painel_producao.Utils;
 using api_painel_producao.Models.Enums;
 using api_painel_producao.Models.RequestModels.Material;
+using api_painel_producao.Models.ResponseModels.Material;
 
 namespace api_painel_producao.Services {
 
     public interface IMaterialService {
         Task<ServiceResponse<int>> CreateMaterialAsync (MaterialDataRequestModel material);
-        Task<ServiceResponse<MaterialDTO>> GetMaterialByIdAsync (int id);
-        Task<ServiceResponse<List<MaterialDTO>>> GetMaterialsByType (string type);
+        Task<ServiceResponse<DetailedMaterialResponseModel>> GetMaterialByIdAsync (int id);
+        Task<ServiceResponse<List<DetailedMaterialResponseModel>>> GetMaterialsByType (string type);
         Task<ServiceResponse<int>> DeleteMaterialById (int id);
     }
 
@@ -34,35 +35,37 @@ namespace api_painel_producao.Services {
             }
         }
 
-        public async Task<ServiceResponse<MaterialDTO>> GetMaterialByIdAsync (int id) {
+        public async Task<ServiceResponse<DetailedMaterialResponseModel>> GetMaterialByIdAsync (int id) {
             try {
 
                 MaterialDTO materialFound = await _repository.GetMaterialById(id);
 
                 if (materialFound is null)
-                    return ServiceResponse<MaterialDTO>.Fail("Action failed: This material does not exist.");
+                    return ServiceResponse<DetailedMaterialResponseModel>.Fail("Action failed: This material does not exist.");
 
-                return ServiceResponse<MaterialDTO>.Ok(materialFound);
+                return ServiceResponse<DetailedMaterialResponseModel>.Ok(DetailedMaterialResponseModel.Create(materialFound));
 
             } catch (Exception e) {
-                return ServiceResponse<MaterialDTO>.Fail("Action failed: internal error");
+                return ServiceResponse<DetailedMaterialResponseModel>.Fail("Action failed: internal error");
             }
         }
 
-        public async Task<ServiceResponse<List<MaterialDTO>>> GetMaterialsByType (string type) { 
+        public async Task<ServiceResponse<List<DetailedMaterialResponseModel>>> GetMaterialsByType (string type) { 
             try {
 
                 bool typeIsValid = Enum.TryParse(type, out MaterialType typeEnum);
 
                 if (!typeIsValid)
-                    return ServiceResponse<List<MaterialDTO>>.Fail("Action failed: this type does not exist.");
+                    return ServiceResponse<List<DetailedMaterialResponseModel>>.Fail("Action failed: this type does not exist.");
 
-                var results = await _repository.GetMaterialsByType(typeEnum);
+                var materials = await _repository.GetMaterialsByType(typeEnum);
 
-                return ServiceResponse<List<MaterialDTO>>.Ok(results);
+                var results = materials.Select(x => DetailedMaterialResponseModel.Create(x)).ToList();
+
+                return ServiceResponse<List<DetailedMaterialResponseModel>>.Ok(results);
 
             } catch (Exception e) {
-                return ServiceResponse<List<MaterialDTO>>.Fail("Action failed: internal error");
+                return ServiceResponse<List<DetailedMaterialResponseModel>>.Fail("Action failed: internal error");
             }
         }
 

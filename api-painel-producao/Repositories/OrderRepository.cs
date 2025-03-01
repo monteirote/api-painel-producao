@@ -7,19 +7,21 @@ using Microsoft.EntityFrameworkCore;
 namespace api_painel_producao.Repositories {
 
     public interface IOrderRepository {
-        Task CreateOrderAsync (OrderDTO orderData, int userId);
-        Task<OrderDTO> GetOrderById (int id);
+        Task CreateOrderAsync(OrderDTO orderData, int userId);
+        Task<OrderDTO> GetOrderById(int id);
+        Task<List<OrderDTO>> GetAllOrdersAsync();
+        Task CancelOrderAsync (int id, int userId);
     }
 
     public class OrderRepository : IOrderRepository {
 
         private readonly AppDbContext _context;
 
-        public OrderRepository (AppDbContext context) {
+        public OrderRepository(AppDbContext context) {
             _context = context;
         }
 
-        public async Task CreateOrderAsync (OrderDTO orderData, int userId) {
+        public async Task CreateOrderAsync(OrderDTO orderData, int userId) {
 
             var createdBy = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
 
@@ -30,10 +32,13 @@ namespace api_painel_producao.Repositories {
 
             var newOrder = new Order {
                 CreatedForId = orderData.CreatedForId,
+                TotalPrice = orderData.TotalPrice,
                 CreatedById = createdBy.Id,
                 Reference = orderData.Reference,
-                Priority = (Priority) Enum.Parse(typeof(Priority), orderData.Priority),
-                CreatedAt = DateTime.Now
+                Priority = (Priority)Enum.Parse(typeof(Priority), orderData.Priority),
+                CreatedAt = DateTime.Now,
+                ExpectedDeliveryDate = orderData.ExpectedDeliveryDate,
+                IsCanceled = false
             };
 
             _context.Orders.Add(newOrder);
@@ -44,7 +49,7 @@ namespace api_painel_producao.Repositories {
             return;
         }
 
-        public async Task<OrderDTO> GetOrderById (int id) {
+        public async Task<OrderDTO> GetOrderById(int id) {
 
             var order = await _context.Orders
                 .Include(x => x.CreatedBy)
@@ -59,11 +64,34 @@ namespace api_painel_producao.Repositories {
                     .ThenInclude(f => f.Background)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
+            order.CreatedFor.Orders = [];
+
             return OrderDTO.Create(order);
         }
 
+        public async Task<List<OrderDTO>> GetAllOrdersAsync() { 
+
+            var orders = await _context.Orders.Include(x => x.CreatedFor).Where(x => !x.IsCanceled).ToListAsync();
+
+            orders.ForEach(x => { 
+                if (x.CreatedFor != null) x.CreatedFor.Orders = [];    
+            });
 
 
+            return orders.Select(order => OrderDTO.Create(order)).ToList();
+        }
+
+        public async Task CancelOrderAsync (int id, int userId) {
+
+            var order = _context.Orders.FirstOrDefault(x => x.Id == id);
+            var user = _context.Users.FirstOrDefault(x => x.Id == userId);
+
+            order.IsCanceled = true;
+            order.CanceledById = userId;
+            order.CanceledBy = user;
+
+            await _context.SaveChangesAsync();
+        }
 
 
     }
