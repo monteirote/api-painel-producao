@@ -47,7 +47,9 @@ namespace api_painel_producao.DTOs
                 Email = customerData.Email,
                 PhoneNumber = customerData.PhoneNumber,
 
-                Orders = customerData.Orders.Select(x => OrderDTO.Create(x)).ToList(),
+                Orders = customerData.Orders is null 
+                                                ? new List<OrderDTO>()
+                                                : customerData.Orders.Select(x => OrderDTO.Create(x)).ToList(),
 
                 CreatedAt = customerData.CreatedAt,
                 CreatedBy = UserDTO.Create(customerData.CreatedBy),

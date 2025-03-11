@@ -2,6 +2,7 @@
 using api_painel_producao.Data;
 using api_painel_producao.Models;
 using api_painel_producao.DTOs;
+using api_painel_producao.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace api_painel_producao.Repositories {
@@ -13,7 +14,10 @@ namespace api_painel_producao.Repositories {
 
         Task<List<CustomerDTO>> FindAllCustomersAsync();
 
+        Task<List<SearchResult>> FindResultsByText (string text);
+
         Task UpdateCustomer (CustomerDTO newData, int tokenId);
+
         Task DeactivateCustomer (int objectId, int userId);
     }
 
@@ -57,7 +61,6 @@ namespace api_painel_producao.Repositories {
         public async Task<List<CustomerDTO>> FindAllCustomersAsync () {
 
             var customersFound = await _context.Customers
-                                                .Include(x => x.Orders)
                                                 .Include(x => x.CreatedBy)
                                                 .Include(x => x.LastModifiedBy)
                                                 .Include(x => x.DeactivatedBy)
@@ -97,7 +100,16 @@ namespace api_painel_producao.Repositories {
             user.ModifiedCustomers.Add(customer);
 
             await _context.SaveChangesAsync();
+        }
 
+        public async Task<List<SearchResult>> FindResultsByText (string text) {
+            var customersFound = await _context.Customers
+                                                    .Where(x => x.Name.Contains(text) && x.IsActive)
+                                                    .ToListAsync();
+
+            var results = customersFound.Select(x => new SearchResult { Id = x.Id, Text = x.Name }).ToList();
+
+            return results;
         }
 
         public async Task DeactivateCustomer (int customerId, int userId) {

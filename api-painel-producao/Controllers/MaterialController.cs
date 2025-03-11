@@ -57,6 +57,18 @@ namespace api_painel_producao.Controllers {
         }
 
 
+        [HttpGet("search")]
+        [Authorize(Roles = "Admin, Vendedor")]
+        public async Task<IActionResult> SearchMaterial ([FromQuery] string text, [FromQuery] string type) {
+            ServiceResponse<List<SearchResult>> response = await _service.SearchMaterialByText(text, type);
+
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+
         [HttpDelete]
         [Authorize (Roles = "Admin, Vendedor")]
         public async Task<IActionResult> DeleteMaterialById ([FromRoute] int id) {

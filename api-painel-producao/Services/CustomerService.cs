@@ -13,6 +13,7 @@ namespace api_painel_producao.Services {
     public interface ICustomerService {
         Task<ServiceResponse<int>> CreateCustomerAsync (string token, CustomerDataRequestModel newCustomerData);
         Task<ServiceResponse<DetailedCustomerResponseModel>> GetCustomerById(int id);
+        Task<ServiceResponse<List<SearchResult>>> SearchCustomer (string text);
 
 
 
@@ -62,7 +63,12 @@ namespace api_painel_producao.Services {
             }
         }
 
-        
+        public async Task<ServiceResponse<List<SearchResult>>> SearchCustomer (string text) {
+
+            var resultsFound = await _repository.FindResultsByText(text);
+
+            return ServiceResponse<List<SearchResult>>.Ok(resultsFound);
+        }
         
         public async Task<ServiceResponse<DetailedCustomerResponseModel>> GetCustomerById (int id) { 
             try {

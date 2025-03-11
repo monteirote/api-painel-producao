@@ -83,6 +83,16 @@ namespace api_painel_producao.Controllers {
         }
 
 
+        [HttpGet("search")]
+        [Authorize(Roles = "Admin, Vendedor")]
+        public async Task<IActionResult> SearchCustomer ([FromQuery] string text) {
+
+            ServiceResponse<List<SearchResult>> foundCustomers = await _service.SearchCustomer(text);
+
+            return Ok(foundCustomers);
+        }
+
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin, Vendedor")]
         public async Task<IActionResult> DeleteCustomer ([FromRoute] int id) {

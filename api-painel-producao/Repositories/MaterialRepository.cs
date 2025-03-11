@@ -13,6 +13,7 @@ namespace api_painel_producao.Repositories{
         Task<List<MaterialDTO>> GetMaterialsByType (MaterialType type);
         Task DeleteMaterial (int id);
         Task<bool> CheckMaterialExistence (MaterialType type, int materialId);
+        Task<List<SearchResult>> FindMaterialsByText (string text, MaterialType type);
     }
 
     public class MaterialRepository : IMaterialRepository {
@@ -76,6 +77,16 @@ namespace api_painel_producao.Repositories{
             if (materialFound.Type != type) return false;
             
             return true;
+        }
+
+        public async Task<List<SearchResult>> FindMaterialsByText (string text, MaterialType type) {
+            var materialsFound = await _context.Materials
+                                                    .Where(x => x.Name.Contains(text) && x.Type == type)
+                                                    .ToListAsync();
+
+            var results = materialsFound.Select(x => new SearchResult { Id = x.Id, Text = x.Name }).ToList();
+
+            return results;
         }
     }
 }

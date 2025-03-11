@@ -11,6 +11,7 @@ namespace api_painel_producao.Services {
         Task<ServiceResponse<int>> CreateMaterialAsync (MaterialDataRequestModel material);
         Task<ServiceResponse<DetailedMaterialResponseModel>> GetMaterialByIdAsync (int id);
         Task<ServiceResponse<List<DetailedMaterialResponseModel>>> GetMaterialsByType (string type);
+        Task<ServiceResponse<List<SearchResult>>> SearchMaterialByText (string text, string type);
         Task<ServiceResponse<int>> DeleteMaterialById (int id);
     }
 
@@ -66,6 +67,22 @@ namespace api_painel_producao.Services {
 
             } catch (Exception e) {
                 return ServiceResponse<List<DetailedMaterialResponseModel>>.Fail("Action failed: internal error");
+            }
+        }
+
+        public async Task<ServiceResponse<List<SearchResult>>> SearchMaterialByText (string text, string type) { 
+            try {
+                bool typeIsValid = Enum.TryParse(type, out MaterialType typeEnum);
+
+                if (!typeIsValid)
+                    return ServiceResponse<List<SearchResult>>.Fail("Action failed: this type does not exist.");
+
+                var materialsFound = await _repository.FindMaterialsByText(text, typeEnum);
+
+                return ServiceResponse<List<SearchResult>>.Ok(materialsFound);
+
+            } catch (Exception e) {
+                return ServiceResponse<List<SearchResult>>.Fail("Action failed: internal error");
             }
         }
 
