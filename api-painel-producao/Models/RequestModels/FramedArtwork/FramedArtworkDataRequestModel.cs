@@ -13,11 +13,15 @@ namespace api_painel_producao.Models.RequestModels.FramedArtwork {
         public float Width { get; set; }
 
 
-        [Required(ErrorMessage = "Action failed: the value of 'Price' is not valid.")]
         [Range(0.01, 1000000.00, ErrorMessage = "Action failed: the value of 'Price' is not valid.")]
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
 
+        [Required]
+        [Range(0, 100)]
+        public int? Quantity { get; set; }
+
+        public List<IFormFile> Images { get; set; }
 
         public int? GlassId { get; set; }
 
@@ -27,5 +31,5 @@ namespace api_painel_producao.Models.RequestModels.FramedArtwork {
 
         public int? PaperId { get; set; }
 
-    }
+   }
 }
