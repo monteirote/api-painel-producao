@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace api_painel_producao.Migrations
 {
     /// <inheritdoc />
-    public partial class BancoInicial : Migration
+    public partial class InitializingDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -181,10 +181,7 @@ namespace api_painel_producao.Migrations
                     Width = table.Column<float>(type: "float", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
                     ImageFile = table.Column<byte[]>(type: "longblob", nullable: true),
-                    ImageFilePath = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ImageDescription = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
                     OrderId = table.Column<int>(type: "int", nullable: true),
                     GlassId = table.Column<int>(type: "int", nullable: true),
                     FrameId = table.Column<int>(type: "int", nullable: true),

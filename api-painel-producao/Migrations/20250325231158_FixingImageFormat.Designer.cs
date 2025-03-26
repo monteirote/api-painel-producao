@@ -11,8 +11,8 @@ using api_painel_producao.Data;
 namespace api_painel_producao.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250301041716_BancoInicial")]
-    partial class BancoInicial
+    [Migration("20250325231158_FixingImageFormat")]
+    partial class FixingImageFormat
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,14 +89,7 @@ namespace api_painel_producao.Migrations
                     b.Property<float>("Height")
                         .HasColumnType("float");
 
-                    b.Property<string>("ImageDescription")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<byte[]>("ImageFile")
-                        .HasColumnType("longblob");
-
-                    b.Property<string>("ImageFilePath")
+                    b.Property<string>("ImageFile")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -104,6 +97,9 @@ namespace api_painel_producao.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("PaperId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")

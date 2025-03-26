@@ -14,13 +14,14 @@ namespace api_painel_producao.Controllers {
 
         private readonly IOrderService _service;
 
-        public OrderController(IOrderService service) {
+        public OrderController (IOrderService service) {
             _service = service;
         }
 
+
         [HttpPost]
         [Authorize(Roles = "Admin, Vendedor")]
-        public async Task<IActionResult> CreateOrder([FromBody] OrderDataRequestModel order) {
+        public async Task<IActionResult> CreateOrder ([FromBody] OrderDataRequestModel order) {
 
             var token = Request.Cookies["jwt"];
 
@@ -31,6 +32,7 @@ namespace api_painel_producao.Controllers {
 
             return CreatedAtAction(nameof(GetOrderById), new { id = response.Data }, new { id = response.Data, message = response.Message });
         }
+
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin, Vendedor")]

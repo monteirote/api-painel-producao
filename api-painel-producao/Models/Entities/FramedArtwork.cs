@@ -8,9 +8,8 @@
 
         public decimal TotalPrice { get; set; }
 
-        public byte[]? ImageFile { get; set; }
-        public string ImageFilePath { get; set; } = string.Empty;
-        public string ImageDescription { get; set; } = string.Empty;
+        public string ImageFile { get; set; }
+        public int Quantity { get; set; }
 
         public int? OrderId { get; set; }
         public Order? Order { get; set; }

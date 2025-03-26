@@ -57,7 +57,7 @@ namespace api_painel_producao.Services {
         public async Task<ServiceResponse<FramedArtworkResponseModel>> GetArtworkById (int id) {
             try {
 
-                var artworkFound = await _repository.GetFramedArtorkById(id);
+                var artworkFound = await _repository.GetFramedArtworkById(id);
 
                 if (artworkFound is null)
                     return ServiceResponse<FramedArtworkResponseModel>.Fail("Action failed: this artwork does not exist");
@@ -74,7 +74,7 @@ namespace api_painel_producao.Services {
         public async Task<ServiceResponse<int>> DeleteArtworkById (int id) {
             try {
 
-                var artworkFound = await _repository.GetFramedArtorkById(id);
+                var artworkFound = await _repository.GetFramedArtworkById(id);
 
                 if (artworkFound is null)
                     return ServiceResponse<int>.Fail("Action failed: this artwork does not exist");

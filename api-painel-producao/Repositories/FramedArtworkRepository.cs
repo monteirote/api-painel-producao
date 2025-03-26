@@ -7,7 +7,7 @@ namespace api_painel_producao.Repositories {
 
     public interface IFramedArtworkRepository {
         Task<int> CreateFramedArtwork (FramedArtworkDTO framedArtwork);
-        Task<FramedArtworkDTO> GetFramedArtorkById (int id);
+        Task<FramedArtworkDTO> GetFramedArtworkById (int id);
         Task DeleteFramedArtwork (int id);
         Task AddFramedArtworkToOrder (FramedArtworkDTO framedArtwork, int orderId);
     }
@@ -29,7 +29,9 @@ namespace api_painel_producao.Repositories {
                 Frame = await _context.Materials.FirstOrDefaultAsync(x => x.Id == framedArtwork.FrameId),
                 Glass = await _context.Materials.FirstOrDefaultAsync(x => x.Id == framedArtwork.GlassId),
                 Background = await _context.Materials.FirstOrDefaultAsync(x => x.Id == framedArtwork.BackgroundId),
-                Paper = await _context.Materials.FirstOrDefaultAsync(x => x.Id == framedArtwork.PaperId)
+                Paper = await _context.Materials.FirstOrDefaultAsync(x => x.Id == framedArtwork.PaperId),
+                Quantity = framedArtwork.Quantity,
+                ImageFile = string.Join(",", framedArtwork.Images)
             };
 
             _context.FramedArtworks.Add(artworkModel);
@@ -38,7 +40,7 @@ namespace api_painel_producao.Repositories {
             return artworkModel.Id;
         }
 
-        public async Task<FramedArtworkDTO> GetFramedArtorkById (int id) { 
+        public async Task<FramedArtworkDTO> GetFramedArtworkById (int id) { 
 
             var artworkFound = await _context.FramedArtworks.FirstOrDefaultAsync(x => x.Id == id);
 
